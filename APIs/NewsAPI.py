@@ -1,12 +1,13 @@
-from Controllers.NewsController import getRoyaNews
+from Controllers.NewsController import _getRoyaNews
 from flask import Blueprint, request, jsonify
 from Functions.Wrappers import Authorize
+from Models.User import Permissions
 
 newsBP = Blueprint("news", __name__)
 
 @newsBP.route("/news", methods=["GET"])
-@Authorize
-def getNews():
+@Authorize(Permissions.GENERAL)
+def getRoyaNews():
     """
     News from "https://en.royanews.tv"
     ---
@@ -33,9 +34,8 @@ def getNews():
         default:
             description: Error from website
     """
-    query = request.args.get("q")
-    if not query:
+    if not (query := request.args.get("q")):
         return jsonify({"error": "Missing required query parameter 'q'"}), 400
 
-    response, code = getRoyaNews(query)
+    response, code = _getRoyaNews(query)
     return jsonify(response), code

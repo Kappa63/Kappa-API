@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 
 
-def getRoyaNews(searchWord: str) -> tuple[dict[str, str|list], int]:
+def _getRoyaNews(searchWord: str) -> tuple[dict[str, str|list], int]:
     """
     Webscrapes "https://en.royanews.tv" for the latest news.
     
@@ -26,8 +26,7 @@ def getRoyaNews(searchWord: str) -> tuple[dict[str, str|list], int]:
 
     flag = False
     for div in sp.find_all("div", class_="news_card_small_title"):
-        aTag = div.find("a") # type: ignore
-        if not aTag:
+        if not (aTag := div.find("a")): # type: ignore
             continue
         aText = aTag.get_text(strip=True) # type: ignore
         if searchWord.lower() in aText.lower():
@@ -38,22 +37,19 @@ def getRoyaNews(searchWord: str) -> tuple[dict[str, str|list], int]:
             newsRes = requests.get(wp)
             newsSp = BeautifulSoup(newsRes.text, "html.parser")
 
-            dataDiv = newsSp.find("div", class_="pup_date_news")
             newsDate = ""
-            if dataDiv:
+            if dataDiv := newsSp.find("div", class_="pup_date_news"):
                 for part in dataDiv.contents: # type: ignore
                     if isinstance(part, str) and part.strip():
                         newsDate = part.strip()
 
-            dataDiv = newsSp.find("div", class_="news_image")
             newsImages = []
-            if dataDiv:
+            if dataDiv := newsSp.find("div", class_="news_image"):
                 for img in dataDiv.find_all("img"): # type: ignore
                     newsImages.append(img.get("src")) # type: ignore
 
-            dataDiv = newsSp.find("div", class_="Newsbody")
             newsBody = ""
-            if dataDiv:
+            if dataDiv := newsSp.find("div", class_="Newsbody"):
                 newsBody = " ".join(p.get_text(strip=True) for p in dataDiv.find_all('p')) # type: ignore
             
             break

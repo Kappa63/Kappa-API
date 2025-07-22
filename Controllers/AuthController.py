@@ -1,8 +1,8 @@
-from Functions.Helpers import hashPass
+from Functions.Helpers import hashPass, verifyPass
 from .DBController import getSession
 from Models import User
 
-def registerUser(uname: str, pwd: str) -> tuple[dict, int]:
+def _registerUser(uname: str, pwd: str) -> tuple[dict, int]:
     """
     Creates a new user
 
@@ -14,15 +14,39 @@ def registerUser(uname: str, pwd: str) -> tuple[dict, int]:
     Returns:
         ``tuple``:
             Containing:
-            - dict keys: `apiKey`, `username`, `perms`, `createdOn`
+            - dict keys: `id`, `apiKey`, `username`, `perms`, `createdOn`
             - int: HTTP status code
     """
     with getSession() as session:
-        existing = session.query(User).filter_by(username=uname).first()
-        if existing:
+        if session.query(User).filter_by(username=uname).first():
             return {"error": "User already exists"}, 409
         newUser = User(username=uname, passwordHash=hashPass(pwd))
         session.add(newUser)
         session.flush()
-        return {"apiKey": newUser.apiKey, "username": newUser.username,
-                "perms": newUser.perms, "createdOn": newUser.createdOn}, 201
+        return {"id": newUser.id, "apiKey": newUser.apiKey, 
+                "username": newUser.username, "perms": newUser.perms,
+                "createdOn": newUser.createdOn}, 201
+    
+def _loginUser(uname: str, pwd: str) -> tuple[dict, int]:
+    """
+    Returns user data
+
+    Parameters:
+        ``uname`` (``str``):
+            username
+        ``pwd`` (``str``):
+            password
+    Returns:
+        ``tuple``:
+            Containing:
+            - dict keys: `id`, `apiKey`, `username`, `perms`, `createdOn`, `updatedOn`, `lastUse`
+            - int: HTTP status code
+    """
+    with getSession() as session:
+        if not (user := session.query(User).filter_by(username=uname).first()):
+            return {"error": "User does not exist"}, 404
+        if (verifyPass(pwd, user.passwordHash)): # type: ignore
+            return {"id": user.id, "apiKey": user.apiKey, 
+                    "username": user.username, "perms": user.perms,
+                    "createdOn": user.createdOn}, 200
+        return {"error": "Invalid credentials"}, 401
