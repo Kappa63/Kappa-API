@@ -1,13 +1,17 @@
+from Functions.Decorators import Ratelimiter
 from Controllers.DBController import initDB
-from flasgger import Swagger
 from flask import Flask
+from flasgger import Swagger
 from config import Config
+from redis import Redis
+
+from APIs.AdminAPI import adminBP
 from APIs.AuthAPI import authBP
 from APIs.NewsAPI import newsBP
-from APIs.AdminAPI import adminBP
-
 
 app = Flask(__name__)
+redisClient = Redis(host="0.0.0.0", port=6379)
+Ratelimiter.init_app(app)
 initDB()
 
 swagger = Swagger(app, template=Config.SWAGGER_CONFIG)

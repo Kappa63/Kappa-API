@@ -2,6 +2,7 @@ from Controllers.DBController import getSession
 from datetime import datetime, timezone
 from Models import User, Permissions
 from flask import request, jsonify
+from flask_limiter import Limiter 
 from functools import wraps
 
 def Authorize(authPerms=Permissions.GENERAL):
@@ -23,3 +24,9 @@ def Authorize(authPerms=Permissions.GENERAL):
             return f(*args, **kwargs)
         return decorated
     return decorator
+
+Ratelimiter = Limiter(
+    key_func=lambda: (request.headers.get("X-API-Key") or request.remote_addr), # type:ignore
+    default_limits=["10/minute"],
+    storage_uri="redis://localhost:6379"
+)

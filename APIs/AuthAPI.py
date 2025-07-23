@@ -1,5 +1,6 @@
 from Controllers.AuthController import _registerUser, _loginUser
 from flask import Blueprint, request, jsonify
+from Functions.Decorators import Ratelimiter
 
 authBP = Blueprint("auth", __name__)
 

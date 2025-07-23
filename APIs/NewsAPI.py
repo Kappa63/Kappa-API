@@ -1,12 +1,13 @@
+from Functions.Decorators import Authorize, Ratelimiter
 from Controllers.NewsController import _getRoyaNews
 from flask import Blueprint, request, jsonify
-from Functions.Wrappers import Authorize
 from Models.User import Permissions
 
 newsBP = Blueprint("news", __name__)
 
 @newsBP.route("/news", methods=["GET"])
 @Authorize(Permissions.GENERAL)
+@Ratelimiter.limit("2/minute")
 def getRoyaNews():
     """
     News from "https://en.royanews.tv"

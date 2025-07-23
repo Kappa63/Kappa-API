@@ -5,3 +5,5 @@ flasgger
 SQLAlchemy
 bcrypt
 gunicorn
+flask-limiter
+redis
