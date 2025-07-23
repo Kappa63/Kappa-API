@@ -33,8 +33,6 @@ def registerUser():
             description: Missing required parameter
         409:
             description: Already exists
-        default:
-            description: Error from website
     """
     data = request.json or {}
     if not (username := data.get("username")):
@@ -73,6 +71,8 @@ def loginUser():
             description: Successful request
         400:
             description: Missing required parameter
+        401:
+            description: Invalid credentials
         404:
             description: User does not exist
     """

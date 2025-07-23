@@ -48,5 +48,6 @@ def _loginUser(uname: str, pwd: str) -> tuple[dict, int]:
         if (verifyPass(pwd, user.passwordHash)): # type: ignore
             return {"id": user.id, "apiKey": user.apiKey, 
                     "username": user.username, "perms": user.perms,
-                    "createdOn": user.createdOn}, 200
+                    "createdOn": user.createdOn, "updatedOn": user.updatedOn,
+                    "lastUse": user.lastUse}, 200
         return {"error": "Invalid credentials"}, 401
