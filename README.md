@@ -9,6 +9,7 @@
 - User registration with API key generation
 - API key authentication via `X-API-Key` header
 - Database integration using SQLAlchemy
+- Redis ratelimiting
 - Swagger UI documentation
 
 ## Getting Started
@@ -23,6 +24,7 @@
 - SQLAlchemy
 - Bcrypt
 - Gunicorn (for production deployment)
+- Redis
 
 ### Installation
 
