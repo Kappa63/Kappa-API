@@ -1,10 +1,11 @@
 from Controllers.AuthController import _registerUser, _loginUser
 from flask import Blueprint, request, jsonify
-from Functions.Decorators import Ratelimiter
+from Functions.Decorators import Ratelimited
 
 authBP = Blueprint("auth", __name__)
 
 @authBP.route("/register", methods=["POST"])
+@Ratelimited
 def registerUser():
     """
     Register user and get your API-Key
@@ -45,9 +46,10 @@ def registerUser():
     return jsonify(response), code
 
 @authBP.route("/login", methods=["POST"])
+@Ratelimited
 def loginUser():
     """
-    Login user and get your User Data
+    Login user and get your user data
     ---
     tags:
       - Auth

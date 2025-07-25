@@ -8,10 +8,14 @@ class Config:
     ADMIN_USERNAME = os.environ["ADMIN_USERNAME"]
     ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 
+    # DEFAULT_KEY = os.environ["DEFAULT_KEY"]
+    # DEFAULT_USERNAME = os.environ["DEFAULT_USERNAME"]
+    # DEFAULT_PASSWORD = os.environ["DEFAULT_PASSWORD"]
+
     SQL_DB = os.environ["DB"]
     SQL_USERS_TABLE = os.environ["USERS_TABLE"]
 
-    SWAGGER_CONFIG = {
+    SWAGGER_TEMPLATE = {
         "swagger": "2.0",
         "info": {
             "title": os.environ["APP_NAME"],
@@ -26,5 +30,31 @@ class Config:
         "externalDocs": {
             "description": "GitHub Repository",
             "url": "https://github.com/Kappa63/Kappa-Api"
-        }
+        },
+        # "securityDefinitions": {
+        #     "APIKeyHeader": {
+        #         "type": "apiKey",
+        #         "name": "X-API-Key",
+        #         "in": "header"
+        #     }
+        # },
+        # "security": [
+        #     {
+        #         "APIKeyHeader": []
+        #     }
+        # ]
+    }
+
+    SWAGGER_CONFIG = {
+        "headers": [],
+        "specs": [
+            {
+                "endpoint": "APIDocs",
+                "route": "/APIDocs",
+                "rule_filter": lambda rule: True,
+                "model_filter": lambda tag: True
+            }
+        ],
+        "static_url_path": "/flasgger_static",
+        "specs_route": "/"
     }

@@ -1,1 +1,1 @@
-from .User import User, Permissions
+from .User import *
