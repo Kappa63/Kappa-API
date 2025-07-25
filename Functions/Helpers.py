@@ -37,7 +37,7 @@ def getUserRatelimit() -> str:
     Returns:
         ``str``: The rate limit string
     """
-    if not (p := g.user):
+    if not (p := getattr(g, "user", None)):
         return "2/minute"
 
     if p.perms & Permissions.ADMIN:

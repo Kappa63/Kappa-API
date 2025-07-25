@@ -7,3 +7,4 @@ bcrypt
 gunicorn
 flask-limiter
 redis
+python-dotenv

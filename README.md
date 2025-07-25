@@ -38,15 +38,15 @@ pip install -r requirements.txt
 #### Development Server
 
 ```bash
-export FLASK_APP=app.py
-flask run --host=0.0.0.0 --port=5000
+export FLASK_APP=setup.py
+python3 -m flask run --host=0.0.0.0 --port=5000
 ```
 #### Production Server (Gunicorn)
 
 ```bash
-gunicorn -w 4 -b 0.0.0.0:5000 app:app
+gunicorn -w 4 -b 0.0.0.0:5000 setup:app
 ```
 
 ### Swagger Documentation
 
-Access the interactive API docs at: `http://localhost:5000/apidocs`
+Access the interactive API docs at: `http://localhost:5000`
