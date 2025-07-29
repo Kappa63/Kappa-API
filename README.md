@@ -1,6 +1,6 @@
 # K-API
 
-**The Kappa API** — a Flask-based REST API.
+**The Kappa API** - a Flask-based REST API running at: https://api.qiblawi.dev
 
 ---
 
