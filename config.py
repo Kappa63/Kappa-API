@@ -26,7 +26,7 @@ class Config:
             }
         },
         "basePath": "/api",
-        "schemes": ["http"],
+        "schemes": ["https"],
         "externalDocs": {
             "description": "GitHub Repository",
             "url": "https://github.com/Kappa63/Kappa-Api"
@@ -56,5 +56,6 @@ class Config:
             }
         ],
         "static_url_path": "/flasgger_static",
-        "specs_route": "/"
+        "specs_route": "/",
+        "title": os.environ["APP_NAME"]
     }
