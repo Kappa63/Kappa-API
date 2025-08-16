@@ -26,7 +26,7 @@ class Config:
             }
         },
         "basePath": "/api",
-        "schemes": ["https"],
+        "schemes": ["http"],
         "externalDocs": {
             "description": "GitHub Repository",
             "url": "https://github.com/Kappa63/Kappa-Api"

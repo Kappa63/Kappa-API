@@ -7,7 +7,7 @@ from redis import Redis
 
 from APIs.AdminAPI import adminBP
 from APIs.AuthAPI import authBP
-from APIs.NewsAPI import newsBP
+from APIs.WebAPI import webBP
 from APIs.UserAPI import userBP
 
 app = Flask(__name__)
@@ -22,7 +22,7 @@ swagger = Swagger(app, template=Config.SWAGGER_TEMPLATE, config=Config.SWAGGER_C
 baseBP = Blueprint("api", __name__, url_prefix="/api")
 
 baseBP.register_blueprint(authBP, url_prefix="/auth") 
-baseBP.register_blueprint(newsBP, url_prefix="/news")
+baseBP.register_blueprint(webBP, url_prefix="/web")
 baseBP.register_blueprint(userBP, url_prefix="/user")
 baseBP.register_blueprint(adminBP, url_prefix="/admin")
 

@@ -1,3 +1,8 @@
 __pycache__
 *.db
 .env
+lib
+lib64
+include
+bin
+*.cfg
