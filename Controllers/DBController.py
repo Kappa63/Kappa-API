@@ -4,9 +4,9 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine
 from Models import User, Permissions
 from Models._base import Base
-from config import Config
+from Config import EnvConfig
 
-engine = create_engine(f"sqlite:///{Config.SQL_DB}.db", echo=False)
+engine = create_engine(f"sqlite:///{EnvConfig.SQL_DB}.db", echo=False)
 Session = sessionmaker(bind=engine)
 
 def initDB():
@@ -27,9 +27,9 @@ def getSession():
 
 def setupAdminUser():
     with getSession() as session:
-        if not session.query(User).filter_by(username=Config.ADMIN_USERNAME).first():
+        if not session.query(User).filter_by(username=EnvConfig.ADMIN_USERNAME).first():
             session.add(User(
-                            username=Config.ADMIN_USERNAME,
-                            passwordHash=hashPass(Config.ADMIN_PASSWORD),
+                            username=EnvConfig.ADMIN_USERNAME,
+                            passwordHash=hashPass(EnvConfig.ADMIN_PASSWORD),
                             perms=Permissions.GENERAL|Permissions.PRIVATE|Permissions.ADMIN
                         ))

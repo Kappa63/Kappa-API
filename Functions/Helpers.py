@@ -1,6 +1,7 @@
 from Models import Permissions
 from flask import g
 import bcrypt
+from Config import APIConfig
 
 def hashPass(passStr: str) -> str:
     """
@@ -38,12 +39,12 @@ def getUserRatelimit() -> str:
         ``str``: The rate limit string
     """
     if not (p := getattr(g, "user", None)):
-        return "2/minute"
+        return APIConfig.NOT_USER_RATELIMIT
 
     if p.perms & Permissions.ADMIN:
-        return "1000/minute"
+        return APIConfig.ADMIN_RATELIMIT
     elif p.perms & Permissions.PRIVATE:
-        return "100/minute"
+        return APIConfig.PRIVATE_RATELIMIT
     else:
-        return "10/minute"
+        return APIConfig.GENERAL_RATELIMIT
     

@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from config import Config
+from Config import EnvConfig
 from ._base import Base
 import sqlalchemy as sa
 import uuid
@@ -12,7 +12,7 @@ class Permissions(enum.IntFlag):
     ADMIN = 4
 
 class User(Base):
-    __tablename__ = Config.SQL_USERS_TABLE
+    __tablename__ = EnvConfig.SQL_USERS_TABLE
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     apiKey = sa.Column(sa.String, unique=True, default=lambda: str(uuid.uuid4()))
