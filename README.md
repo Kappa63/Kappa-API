@@ -11,6 +11,8 @@
 - Database integration using SQLAlchemy
 - Redis ratelimiting
 - Swagger UI documentation
+- Temporary backend for DoseGuard
+- Temporary backend for Portfolio CMS
 
 ## Getting Started
 
