@@ -1,7 +1,7 @@
 from Controllers.AuthController import _registerUser, _loginUser
 from flask import Blueprint, request, jsonify
 from Utils.Decorators import Ratelimited
-from Utils.Helpers.RequestHelpers import handleEndpoint
+from Utils.Helpers.RequestHelpers import handleKwargsEndpoint
 
 authBP = Blueprint("auth", __name__)
 
@@ -39,7 +39,7 @@ def registerUser():
     """
     data = request.json or {}
     fields = [("username", str, True), ("password", str, True)]
-    return handleEndpoint(data, fields, _registerUser)
+    return handleKwargsEndpoint(data, fields, _registerUser)
 
 @authBP.route("/login", methods=["POST"])
 @Ratelimited
@@ -77,4 +77,4 @@ def loginUser():
     """
     data = request.json or {}
     fields = [("username", str, True), ("password", str, True)]
-    return handleEndpoint(data, fields, _loginUser)
+    return handleKwargsEndpoint(data, fields, _loginUser)

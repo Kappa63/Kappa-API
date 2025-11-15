@@ -1,5 +1,5 @@
 from Models import Caregiver, Patient, Pill, Dose, Schedule, ScheduleDoses, CaregiverPatient, PatientSchedule, DoseHistory
-from Utils.Helpers.DBHelpers import createInDB
+from Utils.Helpers.DBHelpers import createInDB, hardDeleteLinkFromDB, updateInDB
 from Utils.Types import ResponsePayload
 
 ### CREATE ###
@@ -89,3 +89,44 @@ def _createDoseHistory(patientId: int, doseId: int, taken: bool) -> ResponsePayl
     entry = createInDB(entry)
 
     return entry.toDict(), 201
+
+### DELETE ###
+def _deleteDoseFromSchedule(payload: dict):
+    return hardDeleteLinkFromDB(
+        ScheduleDoses,
+        {"scheduleId": payload["scheduleId"], "doseId": payload["doseId"]},
+        "Schedule-dose link not found"
+    )
+
+def _deleteScheduleFromPatient(payload: dict):
+    return hardDeleteLinkFromDB(
+        PatientSchedule,
+        {"patientId": payload["patientId"], "scheduleId": payload["scheduleId"]},
+        "Patient-schedule link not found"
+    )
+
+def _deletePatientFromCaregiver(payload: dict):
+    return hardDeleteLinkFromDB(
+        CaregiverPatient,
+        {"caregiverId": payload["caregiverId"], "patientId": payload["patientId"]},
+        "Caregiver-patient link not found"
+    )
+
+### UPDATE ###
+def _updateCaregiver(caregiverId: int, updates: dict):
+    return updateInDB(Caregiver, caregiverId, updates, "Caregiver not found")
+
+def _updatePatient(patientId: int, updates: dict):
+    return updateInDB(Patient, patientId, updates, "Patient not found")
+
+def _updatePill(pillId: int, updates: dict):
+    return updateInDB(Pill, pillId, updates, "Pill not found")
+
+def _updateDose(doseId: int, updates: dict):
+    return updateInDB(Dose, doseId, updates, "Dose not found")
+
+def _updateSchedule(scheduleId: int, updates: dict):
+    return updateInDB(Schedule, scheduleId, updates, "Schedule not found")
+
+def _updateDoseHistory(entryId: int, updates: dict):
+    return updateInDB(DoseHistory, entryId, updates, "Dose history not found")

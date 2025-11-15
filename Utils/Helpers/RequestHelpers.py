@@ -59,23 +59,21 @@ def convertField(value: Any, expectedType: type, key: str):
         }), 400
 
 
-def handleEndpoint(data: JSONDict, fields: List[FieldSpec], func: HandlerFunc) -> Tuple[Response, int]:
+def validateFields(data: JSONDict, fields: List[FieldSpec]):
     """
-    Validate endpoint input fields, convert them to their correct types,
-    and pass them to the handler function.
+    Validate endpoint input fields and convert them to their correct types.
 
     Parameters:
         ``data`` (``dict``):
             The request JSON payload.
         ``fields`` (``list``):
             Field definitions in the format (name, type, required).
-        ``func`` (``callable``):
-            Handler function invoked after validation.
 
     Returns:
         ``tuple``:
-            - ``jsonify`` response dict.
-            - HTTP status code.
+            - Fields or ``None``.
+            - Error response or ``None``.
+            - Error code or ``None``.
     """
     finalFields = {}
 
@@ -83,7 +81,7 @@ def handleEndpoint(data: JSONDict, fields: List[FieldSpec], func: HandlerFunc) -
         if isRequired:
             value, err, code = requireField(data, field)
             if err:
-                return err, code
+                return None, err, code
         else:
             if field not in data:
                 continue
@@ -98,18 +96,65 @@ def handleEndpoint(data: JSONDict, fields: List[FieldSpec], func: HandlerFunc) -
             acceptedVals = {e.value.lower(): e for e in expectedType}
 
             if lowerVal not in acceptedVals:
-                return jsonify({
+                return None, {
                     "error": f"Invalid value for '{field}', expected one of {[e.value for e in expectedType]}"
-                }), 400
+                }, 400
 
             finalFields[field] = acceptedVals[lowerVal]
             continue
 
         value, err, code = convertField(value, expectedType, field)
         if err:
-            return err, code
+            return None, err, code
 
         finalFields[field] = value
 
-    response, code = func(**finalFields)
+    return finalFields, None, None
+
+def handleKwargsEndpoint(data, fields, handler):
+    """
+    Validate fields and pass them to the handler as keyword arguments.
+
+    Parameters:
+        ``data``:
+            Incoming request dictionary (JSON or args).
+        ``fields``:
+            Field specifications: (name, type, required).
+        ``handler``:
+            Function that accepts validated fields via **kwargs.
+
+    Returns:
+        ``tuple``:
+            - jsonify(...) response
+            - HTTP status code
+    """
+    final, err, code = validateFields(data, fields)
+    if err:
+        return jsonify(err), code
+
+    response, code = handler(**final)
+    return jsonify(response), code
+
+def handleDictEndpoint(data, fields, handler):
+    """
+    Validate fields and pass them to the handler as a single dictionary.
+
+    Parameters:
+        ``data``:
+            Incoming request dictionary (typically request.args).
+        ``fields``:
+            Field specifications: (name, type, required).
+        ``handler``:
+            Function that accepts one argument: a dict of validated fields.
+
+    Returns:
+        ``tuple``:
+            - jsonify(...) response
+            - HTTP status code
+    """
+    final, err, code = validateFields(data, fields)
+    if err:
+        return jsonify(err), code
+
+    response, code = handler(final)
     return jsonify(response), code
