@@ -1,4 +1,4 @@
-from Functions.Decorators import Ratelimiter
+from Utils.Decorators import Ratelimiter
 from Controllers.DBController import initDB
 from flask import Flask, Blueprint
 from flasgger import Swagger
@@ -23,7 +23,7 @@ initDB()
 
 swagger = Swagger(app, template=APIConfig.SWAGGER_TEMPLATE(EnvConfig.APP_NAME), config=APIConfig.SWAGGER_CONFIG(EnvConfig.APP_NAME))
 
-os.makedirs(MPortfolioConfig.PORTFOLIO_UPLOADS_FOLDER, exist_ok=True)
+# os.makedirs(MPortfolioConfig.PORTFOLIO_UPLOADS_FOLDER, exist_ok=True)
 
 baseBP = Blueprint("api", __name__, url_prefix="/api")
 

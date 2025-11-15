@@ -1,5 +1,5 @@
 from sqlalchemy.orm import sessionmaker
-from Functions.Helpers import hashPass
+from Utils.Helpers.AuthHelpers import hashPass
 from contextlib import contextmanager
 from sqlalchemy import create_engine
 from Models import User, Permissions

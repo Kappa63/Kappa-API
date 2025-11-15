@@ -1,4 +1,4 @@
-from Functions.Decorators import Ratelimited, Authorize
+from Utils.Decorators import Ratelimited, Authorize
 from Controllers.UsersController import _getUser, _deleteUser
 from flask import Blueprint, jsonify, g
 from Models import Permissions

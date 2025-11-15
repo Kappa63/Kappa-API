@@ -1,0 +1,188 @@
+from Models import Permissions
+from flask import g, jsonify
+import bcrypt
+from Config import APIConfig
+from .Types import Any, Tuple, Optional, List, Enum, Response, FileStorage, FieldSpec, HandlerFunc, JSONDict
+from Controllers.DBController import getSession
+
+def hashPass(passStr: str) -> str:
+    """
+    Hash Password using bcrypt
+
+    Parameters:
+        ``passStr`` (``str``):
+            The string password
+    Returns:
+        ``str``: The hashed password
+    """
+    hashed = bcrypt.hashpw(passStr.encode(), bcrypt.gensalt())
+    return hashed.decode()
+
+def verifyPass(passStr: str, passHash: str) -> bool:
+    """
+    Check password using
+
+    Parameters:
+        ``passStr`` (``str``):
+            The string password
+
+        ``passHash`` (``str``):
+            The hash password
+    Returns:
+        ``bool``: Whether password is correct
+    """
+    return bcrypt.checkpw(passStr.encode(), passHash.encode())
+
+def getUserRatelimit() -> str:
+    """
+    Get the user's rate limit via their permissions
+
+    Returns:
+        ``str``: The rate limit string
+    """
+    if not (p := getattr(g, "user", None)):
+        return APIConfig.NOT_USER_RATELIMIT
+
+    if p.perms & Permissions.ADMIN:
+        return APIConfig.ADMIN_RATELIMIT
+    elif p.perms & Permissions.PRIVATE:
+        return APIConfig.PRIVATE_RATELIMIT
+    else:
+        return APIConfig.GENERAL_RATELIMIT
+    
+def requireField(data: dict, key: str) -> Tuple[Optional[Any], Optional[Response], Optional[int]]:
+    """
+    Validate that a required key exists in request data
+
+    Parameters:
+        ``data`` (``dict``):
+            The request JSON payload
+        ``key`` (``str``):
+            The required field name
+
+    Returns:
+        ``tuple``:
+            - ``value``: The extracted value (or ``None`` if missing)
+            - ``err``: ``jsonify`` response dict on error
+            - ``code``: HTTP status code on error
+    """
+    if key not in data:
+        return None, jsonify({"error": f"{key} required"}), 400
+    return data[key], None, None
+
+def handleEndpoint(data: JSONDict, fields: List[FieldSpec], func: HandlerFunc) -> Tuple[Response, int]:
+    """
+    Validate required endpoint fields and pass them to the handler function
+
+    Parameters:
+        ``data`` (``dict``):
+            The request JSON payload
+        ``fields`` (``list[Tuple[str, type, bool]]``):
+            List of fields with their type and whether they are required.
+        ``func`` (``callable``):
+            The internal handler function that receives the validated fields
+            as keyword arguments
+
+    Returns:
+        ``tuple``:
+            - ``jsonify(dict)``: The response returned by the handler function
+            - ``int``: The HTTP status code returned by the handler function
+    """
+    finalFields = {}
+
+    for field, expectedType, isRequired in fields:
+        if isRequired:
+            value, err, code = requireField(data, field)
+            if err:
+                return err, code
+        else:
+            if field not in data:
+                continue
+            value = data[field]
+
+        if isinstance(value, FileStorage):
+            finalFields[field] = value
+            continue
+
+        if isinstance(expectedType, type) and issubclass(expectedType, Enum):
+            lowerVal = str(value).lower()
+
+            acceptedVals = {e.value.lower(): e for e in expectedType}
+
+            if lowerVal not in acceptedVals:
+                return jsonify({
+                    "error": f"Invalid value for '{field}', expected one of {[e.value for e in expectedType]}"
+                }), 400
+
+            finalFields[field] = acceptedVals[lowerVal]
+            continue
+
+        value, err, code = convertField(value, expectedType, field)
+        if err:
+            return err, code
+        
+        finalFields[field] = value
+
+    response, code = func(**finalFields)
+    return jsonify(response), code
+
+def convertField(value: Any, expectedType: type, key: str):
+    """
+    Convert a field value to a required type.
+
+    Parameters:
+        ``value`` (``any``):
+            The raw value extracted from the request payload
+        ``expectedType`` (``type``):
+            The type the field must be converted into
+        ``key`` (``str``):
+            The field name (used for error messages)
+
+    Returns:
+        ``tuple``:
+            - The converted value (or ``None`` on failure)
+            - ``jsonify`` error response on invalid type (or ``None``)
+            - HTTP error code (or ``None``)
+
+    Notes:
+        - Handles ``int``, ``float``, and ``str`` directly using type casting
+        - Handles ``bool`` with common string values:
+            true/1/yes → ``True``
+            false/0/no → ``False``
+        - Returns a consistent error when conversion fails
+    """
+    try:
+        if expectedType == bool:
+            if str(value).lower() in ["true", "1", "yes"]:
+                return True, None, None
+            if str(value).lower() in ["false", "0", "no"]:
+                return False, None, None
+            return None, jsonify({"error": f"Invalid bool for field '{key}'"}), 400
+
+        return expectedType(value), None, None
+
+    except (ValueError, TypeError):
+        return None, jsonify({"error": f"Invalid type for field '{key}', expected {expectedType.__name__}"}), 400
+
+def getFromDB(model, idValue: int, notFoundMessage: str):
+    """
+    Fetch a single database record by ID.
+
+    Parameters:
+        ``model``:
+            SQLAlchemy model class used for the lookup.
+        ``idValue`` (``int``):
+            The primary key value of the record to retrieve.
+        ``notFoundMessage`` (``str``):
+            Error message returned if the record does not exist.
+
+    Returns:
+        ``tuple``:
+            - dict: The serialized model data using ``toDict()``.
+            - int:  HTTP status code (``200`` on success, ``404`` if not found).
+    """
+    with getSession() as session:
+        obj = session.get(model, idValue)
+        if not obj:
+            return {"error": notFoundMessage}, 404
+        return obj.toDict(), 200

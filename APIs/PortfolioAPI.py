@@ -1,6 +1,8 @@
 from Controllers.PortfolioController import _uploadImage, _listPosts, _createPost
 from flask import Blueprint, jsonify, request
-from Functions.Decorators import Ratelimited
+from Utils.Decorators import Ratelimited
+from Utils.Helpers.RequestHelpers import handleEndpoint
+from Utils.Types import FileStorage
 
 portfolioBP = Blueprint("portfolio", __name__)
 
@@ -15,17 +17,9 @@ def uploadImage():
 @portfolioBP.route("/posts", methods=["POST"])
 def createPost(): 
     data = request.json or {}
-    if not (imageURL := data.get("imageURL")):
-        return jsonify({"error": "imageUrl required"}), 400
-    if not (title := data.get("title")):
-        return jsonify({"error": "title required"}), 400
-    if not (description := data.get("description")):
-        return jsonify({"error": "description required"}), 400
-    if not (category := data.get("category")):
-        return jsonify({"error": "category required"}), 400
-    
-    response, code = _createPost(imageURL, title, description, category)
-    return jsonify(response), code
+    fields = [("imageURL", str, True), ("title", str, True), ("description", str, True), ("category", str, True)]
+
+    return handleEndpoint(data, fields, _createPost)
 
 @portfolioBP.route("/posts", methods=["GET"])
 def listPosts():

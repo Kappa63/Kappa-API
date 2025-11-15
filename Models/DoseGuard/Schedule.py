@@ -14,5 +14,16 @@ class Schedule(Base):
     updatedOn = sa.Column(sa.DateTime, onupdate=lambda: datetime.now(timezone.utc))
     active = sa.Column(sa.Boolean, default=True)
 
+    
     patients = sa.orm.relationship("Patient", secondary=DoseGuardConfig.SQL_PATIENT_SCHEDULE_TABLE, back_populates="schedules")
     doses = sa.orm.relationship("Dose", secondary=DoseGuardConfig.SQL_SCHEDULE_DOSES_TABLE, back_populates="schedules")
+
+
+    def toDict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "active": self.active,
+            "createdOn": self.createdOn,
+            "updatedOn": self.updatedOn,
+        }

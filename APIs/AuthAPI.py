@@ -1,6 +1,7 @@
 from Controllers.AuthController import _registerUser, _loginUser
 from flask import Blueprint, request, jsonify
-from Functions.Decorators import Ratelimited
+from Utils.Decorators import Ratelimited
+from Utils.Helpers.RequestHelpers import handleEndpoint
 
 authBP = Blueprint("auth", __name__)
 
@@ -37,13 +38,8 @@ def registerUser():
             description: Already exists
     """
     data = request.json or {}
-    if not (username := data.get("username")):
-        return jsonify({"error": "username required"}), 400
-    if not (password := data.get("password")):
-        return jsonify({"error": "password required"}), 400
-
-    response, code = _registerUser(username, password)
-    return jsonify(response), code
+    fields = [("username", str, True), ("password", str, True)]
+    return handleEndpoint(data, fields, _registerUser)
 
 @authBP.route("/login", methods=["POST"])
 @Ratelimited
@@ -80,10 +76,5 @@ def loginUser():
             description: User does not exist
     """
     data = request.json or {}
-    if not (username := data.get("username")):
-        return jsonify({"error": "username required"}), 400
-    if not (password := data.get("password")):
-        return jsonify({"error": "password required"}), 400
-
-    response, code = _loginUser(username, password)
-    return jsonify(response), code
+    fields = [("username", str, True), ("password", str, True)]
+    return handleEndpoint(data, fields, _loginUser)

@@ -1,6 +1,7 @@
-from typing import Literal, Optional
 from bs4 import BeautifulSoup
 import requests
+from Utils.Types import Optional
+from Utils.Enums import SortOrder
 
 
 def _getRoyaNews(searchWord: str) -> tuple[dict[str, str|list], int]:
@@ -61,7 +62,7 @@ def _getRoyaNews(searchWord: str) -> tuple[dict[str, str|list], int]:
                 "body":newsBody}, 200
     return {}, 204
         
-def _find1337xTorrents(torrentName: str, time: Optional[Literal["asc", "desc"]] = None) -> tuple[list[dict[str, str]], int]:
+def _find1337xTorrents(torrentName: str, time: Optional[SortOrder] = None) -> tuple[list[dict[str, str]], int]:
     """
     Webscrapes "https://1337x.to" for a torrent
     

@@ -1,4 +1,4 @@
-from Functions.Helpers import hashPass, verifyPass
+from Utils.Helpers.AuthHelpers import hashPass, verifyPass
 from .DBController import getSession
 from Models import User
 

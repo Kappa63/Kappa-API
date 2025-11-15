@@ -1,7 +1,7 @@
 from Models import User, DetachedUser, Permissions
 from Controllers.DBController import getSession
 from datetime import datetime, timezone
-from .Helpers import getUserRatelimit
+from Helpers.AuthHelpers import getUserRatelimit
 from flask import request, jsonify, g
 from flask_limiter import Limiter 
 from functools import wraps

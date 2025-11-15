@@ -18,5 +18,16 @@ class Caregiver(Base):
     updatedOn = sa.Column(sa.DateTime, onupdate=lambda: datetime.now(timezone.utc))
     active = sa.Column(sa.Boolean, default=True)
 
-    # relationships
+
     patients = sa.orm.relationship("Patient", secondary=DoseGuardConfig.SQL_CAREGIVER_PATIENT_TABLE, back_populates="caregivers")
+    
+
+    def toDict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "username": self.username,
+            "active": self.active,
+            "createdOn": self.createdOn,
+            "updatedOn": self.updatedOn,
+        }

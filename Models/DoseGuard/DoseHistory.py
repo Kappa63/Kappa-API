@@ -16,5 +16,18 @@ class DoseHistory(Base):
     updatedOn = sa.Column(sa.DateTime, onupdate=lambda: datetime.now(timezone.utc))
     active = sa.Column(sa.Boolean, default=True)
 
+
     patient = sa.orm.relationship("Patient", back_populates="doseHistory")
     dose = sa.orm.relationship("Dose", back_populates="history")
+
+
+    def toDict(self):
+        return {
+            "id": self.id,
+            "patientId": self.patientId,
+            "doseId": self.doseId,
+            "taken": self.taken,
+            "active": self.active,
+            "createdOn": self.createdOn,
+            "updatedOn": self.updatedOn,
+        }

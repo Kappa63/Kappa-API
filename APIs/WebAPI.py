@@ -1,7 +1,9 @@
-from Functions.Decorators import Authorize, Ratelimited
+from Utils.Decorators import Authorize, Ratelimited
 from Controllers.WebController import _getRoyaNews, _find1337xTorrents
 from flask import Blueprint, request, jsonify
 from Models import Permissions
+from Utils.Helpers.RequestHelpers import handleEndpoint
+from Utils.Enums import SortOrder
 
 webBP = Blueprint("web", __name__)
 
@@ -35,11 +37,9 @@ def getRoyaNews():
         default:
             description: Error from website
     """
-    if not (query := request.args.get("q")):
-        return jsonify({"error": "Missing required query parameter 'q'"}), 400
-
-    response, code = _getRoyaNews(query)
-    return jsonify(response), code
+    data = request.args
+    fields = [("q", str, True)]
+    return handleEndpoint(data, fields, _getRoyaNews)
 
 @webBP.route("/torrent", methods=["GET"])
 @Authorize(Permissions.GENERAL)
@@ -76,12 +76,8 @@ def find1337xTorrents():
         default:
             description: Error from website
     """
-    if not (query := request.args.get("q")):
-        return jsonify({"error": "Missing required query parameter 'q'"}), 400
-    
-    sorting = request.args.get("tsort")
-    if sorting:
-        sorting = sorting.lower()
+    data = request.args
 
-    response, code = _find1337xTorrents(query, sorting if sorting in ("asc", "desc") else None)
-    return jsonify(response), code
+    fields = [("q", str, True), ("tsort", SortOrder, False)]
+
+    return handleEndpoint(data, fields, _find1337xTorrents)

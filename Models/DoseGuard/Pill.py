@@ -15,4 +15,16 @@ class Pill(Base):
     updatedOn = sa.Column(sa.DateTime, onupdate=lambda: datetime.now(timezone.utc))
     active = sa.Column(sa.Boolean, default=True)
 
+
     doses = sa.orm.relationship("Dose", back_populates="pill")
+
+
+    def toDict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "strength": self.strength,
+            "active": self.active,
+            "createdOn": self.createdOn,
+            "updatedOn": self.updatedOn,
+        }

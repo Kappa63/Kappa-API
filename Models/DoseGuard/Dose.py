@@ -16,6 +16,19 @@ class Dose(Base):
     updatedOn = sa.Column(sa.DateTime, onupdate=lambda: datetime.now(timezone.utc))
     active = sa.Column(sa.Boolean, default=True)
 
+
     pill = sa.orm.relationship("Pill", back_populates="doses")
     schedules = sa.orm.relationship("Schedule", secondary=DoseGuardConfig.SQL_SCHEDULE_DOSES_TABLE, back_populates="doses")
     history = sa.orm.relationship("DoseHistory", back_populates="dose")
+
+
+    def toDict(self):
+        return {
+            "id": self.id,
+            "pillId": self.pillId,
+            "interval": self.interval,
+            "amount": self.amount,
+            "active": self.active,
+            "createdOn": self.createdOn,
+            "updatedOn": self.updatedOn,
+        }
