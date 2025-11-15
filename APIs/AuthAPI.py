@@ -77,4 +77,5 @@ def loginUser():
     """
     data = request.json or {}
     fields = [("username", str, True), ("password", str, True)]
+    
     return handleKwargsEndpoint(data, fields, _loginUser)

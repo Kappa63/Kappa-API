@@ -226,10 +226,7 @@ def updateCaregiver(caregiverId):
     data = request.json or {}
     fields = [("name", str, False), ("username", str, False), ("passwordHash", str, False)]
 
-    return handleKwargsEndpoint(
-        data, fields,
-        lambda **upd: _updateCaregiver(caregiverId, upd)
-    )
+    return handleKwargsEndpoint(data, fields, lambda **upd: _updateCaregiver(caregiverId, upd))
 
 @doseGuardBP.route("/patients/<int:patientId>", methods=["PATCH"])
 def updatePatient(patientId):
@@ -243,10 +240,7 @@ def updatePill(pillId):
     data = request.json or {}
     fields = [("name", str, False), ("strength", float, False)]
 
-    return handleKwargsEndpoint(
-        data, fields,
-        lambda **upd: _updatePill(pillId, upd)
-    )
+    return handleKwargsEndpoint(data, fields, lambda **upd: _updatePill(pillId, upd))
 
 @doseGuardBP.route("/doses/<int:doseId>", methods=["PATCH"])
 def updateDose(doseId):

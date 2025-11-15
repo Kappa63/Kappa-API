@@ -1,7 +1,7 @@
 from Controllers.PortfolioController import _uploadImage, _listPosts, _createPost
 from flask import Blueprint, jsonify, request
 from Utils.Decorators import Ratelimited
-from Utils.Helpers.RequestHelpers import handleEndpoint
+from Utils.Helpers.RequestHelpers import handleKwargsEndpoint
 from Utils.Types import FileStorage
 
 portfolioBP = Blueprint("portfolio", __name__)
@@ -19,7 +19,7 @@ def createPost():
     data = request.json or {}
     fields = [("imageURL", str, True), ("title", str, True), ("description", str, True), ("category", str, True)]
 
-    return handleEndpoint(data, fields, _createPost)
+    return handleKwargsEndpoint(data, fields, _createPost)
 
 @portfolioBP.route("/posts", methods=["GET"])
 def listPosts():

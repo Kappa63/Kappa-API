@@ -2,7 +2,7 @@ from Utils.Decorators import Authorize, Ratelimited
 from Controllers.WebController import _getRoyaNews, _find1337xTorrents
 from flask import Blueprint, request, jsonify
 from Models import Permissions
-from Utils.Helpers.RequestHelpers import handleEndpoint
+from Utils.Helpers.RequestHelpers import handleKwargsEndpoint
 from Utils.Enums import SortOrder
 
 webBP = Blueprint("web", __name__)
@@ -39,7 +39,8 @@ def getRoyaNews():
     """
     data = request.args
     fields = [("q", str, True)]
-    return handleEndpoint(data, fields, _getRoyaNews)
+    
+    return handleKwargsEndpoint(data, fields, _getRoyaNews)
 
 @webBP.route("/torrent", methods=["GET"])
 @Authorize(Permissions.GENERAL)
@@ -77,7 +78,6 @@ def find1337xTorrents():
             description: Error from website
     """
     data = request.args
-
     fields = [("q", str, True), ("tsort", SortOrder, False)]
 
-    return handleEndpoint(data, fields, _find1337xTorrents)
+    return handleKwargsEndpoint(data, fields, _find1337xTorrents)
