@@ -1,7 +1,7 @@
 from Controllers.PortfolioController import _uploadImage, _listPosts, _createPost
+from Utils.Helpers.RequestHelpers import handleKwargsEndpoint
 from flask import Blueprint, jsonify, request
 from Utils.Decorators import Ratelimited
-from Utils.Helpers.RequestHelpers import handleKwargsEndpoint
 from Utils.Types import FileStorage
 
 portfolioBP = Blueprint("portfolio", __name__)

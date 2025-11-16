@@ -1,13 +1,22 @@
-from Models import Caregiver, Patient, Pill, Dose, Schedule, ScheduleDoses, CaregiverPatient, PatientSchedule, DoseHistory
+from Models import (User, Caregiver, Patient, Pill, Dose, Schedule, ScheduleDoses,
+                    CaregiverPatient, PatientSchedule, DoseHistory)
 from Utils.Helpers.DBHelpers import createInDB, hardDeleteLinkFromDB, updateInDB
+from Controllers.DBController import getSession
 from Utils.Types import ResponsePayload
+from Utils.Enums import Permissions
 
 ### CREATE ###
 def _createCaregiver(name: str, username: str, passwordHash: str) -> ResponsePayload:
+    user = User(
+        username=username, 
+        passwordHash=passwordHash, 
+        perms=Permissions.PRIVATE
+    )
+    user = createInDB(user)
+
     caregiver = Caregiver(
-        name=name,
-        username=username,
-        passwordHash=passwordHash
+        name=name, 
+        userId=user.id
     )
     caregiver = createInDB(caregiver)
 
@@ -114,7 +123,26 @@ def _deletePatientFromCaregiver(payload: dict):
 
 ### UPDATE ###
 def _updateCaregiver(caregiverId: int, updates: dict):
-    return updateInDB(Caregiver, caregiverId, updates, "Caregiver not found")
+    with getSession() as session:
+        caregiver = session.get(Caregiver, caregiverId)
+
+        if not caregiver or not caregiver.active:
+            return {"error": "Caregiver not found"}, 404
+
+        if "name" in updates:
+            caregiver.name = updates["name"]
+
+        user = caregiver.user
+
+        if "username" in updates:
+            user.username = updates["username"]
+
+        if "passwordHash" in updates:
+            user.passwordHash = updates["passwordHash"]
+
+        session.flush()
+        return caregiver.toDict(), 200
+
 
 def _updatePatient(patientId: int, updates: dict):
     return updateInDB(Patient, patientId, updates, "Patient not found")

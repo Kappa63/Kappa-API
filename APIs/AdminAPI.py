@@ -1,7 +1,7 @@
 from Controllers.AdminController import _patchUser, _listUsers
 from flask import Blueprint, jsonify, request
 from Utils.Decorators import Authorize
-from Models import Permissions
+from Utils.Enums import Permissions
 
 adminBP = Blueprint("admin", __name__)
 

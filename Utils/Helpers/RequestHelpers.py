@@ -1,7 +1,7 @@
-from flask import jsonify
-from werkzeug.datastructures import FileStorage
-from enum import Enum
 from Utils.Types import Any, Tuple, Optional, List, FieldSpec, HandlerFunc, JSONDict, Response
+from werkzeug.datastructures import FileStorage
+from flask import jsonify
+from enum import Enum
 
 def requireField(data: dict, key: str) -> Tuple[Optional[Any], Optional[Response], Optional[int]]:
     """

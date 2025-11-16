@@ -1,15 +1,9 @@
 from datetime import datetime, timezone
+from Utils.Enums import Permissions
 from Config import EnvConfig
 from ._base import Base
 import sqlalchemy as sa
 import uuid
-import enum
-
-class Permissions(enum.IntFlag):
-    DEFAULT = 0
-    GENERAL = 1
-    PRIVATE = 2
-    ADMIN = 4
 
 class User(Base):
     __tablename__ = EnvConfig.SQL_USERS_TABLE
@@ -23,6 +17,15 @@ class User(Base):
     createdOn = sa.Column(sa.DateTime, default=lambda: datetime.now(timezone.utc))
     updatedOn = sa.Column(sa.DateTime, onupdate=lambda: datetime.now(timezone.utc))
     lastUse = sa.Column(sa.DateTime)
+
+    def toDict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "perms": self.perms,
+        }
+    
+    caregiverProfile = sa.orm.relationship("Caregiver", uselist=False, back_populates="user")
 
 class DetachedUser:
     def __init__(self, user: User) -> None:

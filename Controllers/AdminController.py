@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
-from Models import User, Permissions
 from .DBController import getSession
+from Utils.Enums import Permissions
+from Models import User
 
 def _patchUser(uid: int, newData: dict) -> tuple[dict, int]:
     """

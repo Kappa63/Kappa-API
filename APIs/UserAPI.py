@@ -1,7 +1,7 @@
-from Utils.Decorators import Ratelimited, Authorize
 from Controllers.UsersController import _getUser, _deleteUser
+from Utils.Decorators import Ratelimited, Authorize
 from flask import Blueprint, jsonify, g
-from Models import Permissions
+from Utils.Enums import Permissions
 
 userBP = Blueprint("user", __name__)
 

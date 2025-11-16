@@ -1,7 +1,7 @@
+from Utils.Enums import SortOrder
+from Utils.Types import Optional
 from bs4 import BeautifulSoup
 import requests
-from Utils.Types import Optional
-from Utils.Enums import SortOrder
 
 
 def _getRoyaNews(searchWord: str) -> tuple[dict[str, str|list], int]:

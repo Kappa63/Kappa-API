@@ -1,8 +1,8 @@
-from Utils.Decorators import Authorize, Ratelimited
 from Controllers.WebController import _getRoyaNews, _find1337xTorrents
-from flask import Blueprint, request, jsonify
-from Models import Permissions
 from Utils.Helpers.RequestHelpers import handleKwargsEndpoint
+from Utils.Decorators import Authorize, Ratelimited
+from flask import Blueprint, request, jsonify
+from Utils.Enums import Permissions
 from Utils.Enums import SortOrder
 
 webBP = Blueprint("web", __name__)

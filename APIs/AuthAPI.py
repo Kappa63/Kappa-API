@@ -1,7 +1,7 @@
 from Controllers.AuthController import _registerUser, _loginUser
+from Utils.Helpers.RequestHelpers import handleKwargsEndpoint
 from flask import Blueprint, request, jsonify
 from Utils.Decorators import Ratelimited
-from Utils.Helpers.RequestHelpers import handleKwargsEndpoint
 
 authBP = Blueprint("auth", __name__)
 

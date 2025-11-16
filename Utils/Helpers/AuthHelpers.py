@@ -1,7 +1,7 @@
+from Utils.Enums import Permissions
+from Config import APIConfig
 from flask import g
 import bcrypt
-from Models import Permissions
-from Config import APIConfig
 
 def hashPass(passStr: str) -> str:
     """

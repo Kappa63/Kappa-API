@@ -1,9 +1,9 @@
-from Utils.Decorators import Ratelimiter
+from Config import EnvConfig, APIConfig, MPortfolioConfig
 from Controllers.DBController import initDB
+from Utils.Decorators import Ratelimiter
 from flask import Flask, Blueprint
 from flasgger import Swagger
 from flask_cors import CORS
-from Config import EnvConfig, APIConfig, MPortfolioConfig
 from redis import Redis
 import os
 
@@ -12,6 +12,7 @@ from APIs.AdminAPI import adminBP
 from APIs.AuthAPI import authBP
 from APIs.WebAPI import webBP
 from APIs.UserAPI import userBP
+from APIs.DoseGuardAPI import doseGuardBP
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:63342", "http://127.0.0.1:3000"])
@@ -32,6 +33,7 @@ baseBP.register_blueprint(webBP, url_prefix="/web")
 baseBP.register_blueprint(userBP, url_prefix="/user")
 baseBP.register_blueprint(adminBP, url_prefix="/admin")
 baseBP.register_blueprint(portfolioBP, url_prefix="/portfolio")
+baseBP.register_blueprint(doseGuardBP, url_prefix="/doseguard")
 
 app.register_blueprint(baseBP)
 

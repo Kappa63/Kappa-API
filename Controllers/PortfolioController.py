@@ -1,8 +1,8 @@
 from werkzeug.datastructures import FileStorage
 from datetime import datetime, timezone
 from .DBController import getSession
-from Models import Post
 from Config import MPortfolioConfig
+from Models import Post
 import uuid
 import os
 
