@@ -39,7 +39,7 @@ def createInDB(model):
     with getSession() as session:
         session.add(model)
         session.flush()
-        return model
+        return model.toDict()
     
 def softDeleteFromDB(model, idValue: int, notFoundMessage: str):
     """

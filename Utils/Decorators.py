@@ -1,4 +1,4 @@
-from Helpers.AuthHelpers import getUserRatelimit
+from Utils.Helpers.AuthHelpers import getUserRatelimit
 from Controllers.DBController import getSession
 from datetime import datetime, timezone
 from Models import User, DetachedUser

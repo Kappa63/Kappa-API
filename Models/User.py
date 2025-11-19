@@ -23,6 +23,7 @@ class User(Base):
             "id": self.id,
             "username": self.username,
             "perms": self.perms,
+            "apiKey": self.apiKey
         }
     
     caregiverProfile = sa.orm.relationship("Caregiver", uselist=False, back_populates="user")

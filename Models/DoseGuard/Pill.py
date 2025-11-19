@@ -7,7 +7,7 @@ import sqlalchemy as sa
 class Pill(Base):
     __tablename__ = DoseGuardConfig.SQL_PILLS_TABLE
 
-    id = sa.Column(sa.BigInteger, primary_key=True, autoincrement=True)
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     name = sa.Column(sa.String(50), nullable=False)
     strength = sa.Column(sa.Float, nullable=False)
 

@@ -7,7 +7,7 @@ import sqlalchemy as sa
 class DoseHistory(Base):
     __tablename__ = DoseGuardConfig.SQL_DOSE_HISTORY_TABLE
 
-    id = sa.Column(sa.BigInteger, primary_key=True, autoincrement=True)
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     patientId = sa.Column(sa.BigInteger, sa.ForeignKey(DoseGuardConfig.SQL_PATIENT_TABLE + ".id"), nullable=False)
     doseId = sa.Column(sa.BigInteger, sa.ForeignKey(DoseGuardConfig.SQL_DOSES_TABLE + ".id"), nullable=False)
     taken = sa.Column(sa.Boolean, nullable=False, default=False)

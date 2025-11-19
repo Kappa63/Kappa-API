@@ -18,6 +18,7 @@ class Caregiver(Base):
     active = sa.Column(sa.Boolean, default=True)
 
     user = sa.orm.relationship("User", back_populates="caregiverProfile")
+    patients = sa.orm.relationship("Patient", secondary=DoseGuardConfig.SQL_CAREGIVER_PATIENT_TABLE, back_populates="caregivers")
 
     def toDict(self):
         return {

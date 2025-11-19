@@ -7,7 +7,7 @@ import sqlalchemy as sa
 class Dose(Base):
     __tablename__ = DoseGuardConfig.SQL_DOSES_TABLE
 
-    id = sa.Column(sa.BigInteger, primary_key=True, autoincrement=True)
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     pillId = sa.Column(sa.BigInteger, sa.ForeignKey(DoseGuardConfig.SQL_PILLS_TABLE + ".id"), nullable=False)
     interval = sa.Column(sa.BigInteger, nullable=False)
     amount = sa.Column(sa.BigInteger, nullable=False)
