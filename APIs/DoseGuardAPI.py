@@ -26,7 +26,7 @@ def createCaregiver():
 @Ratelimited
 def createPatient():
     data = request.json or {}
-    fields = [("name", str, True), ("age", int, False), ("weight", float, False), ("height", float, False), ("contact", str, False)]
+    fields = [("name", str, True), ("dob", str, False), ("weight", float, False), ("height", float, False), ("contact", str, False)]
 
     return handleKwargsEndpoint(data, fields, _createPatient)
 
@@ -307,7 +307,7 @@ def updateCaregiver(caregiverId):
 @Ratelimited
 def updatePatient(patientId):
     data = request.json or {}
-    fields = [("name", str, False), ("contact", str, False), ("age", int, False), ("weight", float, False), ("height", float, False)]
+    fields = [("name", str, False), ("contact", str, False), ("dob", str, False), ("weight", float, False), ("height", float, False)]
 
     return handleKwargsEndpoint(data, fields, lambda **upd: _updatePatient(patientId, upd))
 

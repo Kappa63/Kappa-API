@@ -10,7 +10,7 @@ class Patient(BaseAuditEntity):
 
     name = sa.Column(sa.String(50), nullable=False)
     contact = sa.Column(sa.String(25))
-    age = sa.Column(sa.Integer)
+    dob = sa.Column(sa.Date)
     weight = sa.Column(sa.Float)
     height = sa.Column(sa.Float)
 
@@ -25,7 +25,7 @@ class Patient(BaseAuditEntity):
             "id": self.id,
             "name": self.name,
             "contact": self.contact,
-            "age": self.age,
+            "dob": self.dob.isoformat() if self.dob else None,
             "weight": self.weight,
             "height": self.height,
             "active": self.active,

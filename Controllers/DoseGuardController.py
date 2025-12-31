@@ -5,6 +5,7 @@ from Controllers.DBController import getSession
 from Utils.Types import ResponsePayload
 from Utils.Enums import Permissions
 from Utils.Helpers.AuthHelpers import hashPass, verifyPass
+from datetime import datetime
 
 ### CREATE ###
 def _createCaregiver(name: str, username: str, password: str) -> ResponsePayload:
@@ -19,12 +20,12 @@ def _createCaregiver(name: str, username: str, password: str) -> ResponsePayload
         userId=user["id"]
     )), 201
     
-def _createPatient(name: str, contact: str = None, age: int = None,
+def _createPatient(name: str, contact: str = None, dob: str = None,
                    weight: float = None, height: float = None) -> ResponsePayload:
     return createInDB(Patient(
         name=name,
         contact=contact,
-        age=age,
+        dob=datetime.fromisoformat(dob).date() if dob else None,
         weight=weight,
         height=height
     )), 201
