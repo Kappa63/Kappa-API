@@ -8,7 +8,7 @@ from Utils.Helpers.AuthHelpers import hashPass, verifyPass
 from datetime import datetime
 
 ### CREATE ###
-def _createCaregiver(name: str, username: str, password: str) -> ResponsePayload:
+def _registerCaregiver(name: str, username: str, password: str) -> ResponsePayload:
     user = createInDB(User(
         username=username, 
         passwordHash=hashPass(password), 
@@ -19,7 +19,30 @@ def _createCaregiver(name: str, username: str, password: str) -> ResponsePayload
         name=name, 
         userId=user["id"]
     )), 201
-    
+
+def _loginCaregiver(username: str, password: str) -> tuple[dict, int]:
+    with getSession() as session:
+        caregiver = session.query(Caregiver).join(User).filter(User.username == username).first()
+        
+        if not caregiver:
+            return {"error": "Caregiver does not exist"}, 404
+        
+        user = caregiver.user
+        
+        if verifyPass(password, user.passwordHash): # type: ignore
+            return {
+                "id": caregiver.id,
+                "name": caregiver.name,
+                "apiKey": user.apiKey,
+                "username": user.username,
+                "perms": user.perms,
+                "createdOn": user.createdOn,
+                "updatedOn": user.updatedOn,
+                "lastUse": user.lastUse
+            }, 200
+        
+        return {"error": "Invalid credentials"}, 401
+
 def _createPatient(name: str, contact: str = None, dob: str = None,
                    weight: float = None, height: float = None) -> ResponsePayload:
     return createInDB(Patient(

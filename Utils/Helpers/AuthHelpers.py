@@ -1,7 +1,10 @@
+from Models import PatientSchedule, CaregiverPatient, Caregiver, Dose, ScheduleDoses, DoseHistory
+from Controllers.DBController import getSession
 from Utils.Enums import Permissions
 from Config import APIConfig
 from flask import g
 import bcrypt
+import sqlalchemy as sa
 
 def hashPass(passStr: str) -> str:
     """
@@ -55,3 +58,170 @@ def getUserRatelimit() -> str:
         return APIConfig.PRIVATE_RATELIMIT
     else:
         return APIConfig.GENERAL_RATELIMIT
+
+
+def getCaregiverIdFromRequest():
+    """
+    Get the caregiver ID associated with the authenticated user from the request context.
+
+    Returns:
+        ``int | None``:
+            The caregiver ID if found, None otherwise.
+    """
+    if not (user := getattr(g, "user", None)):
+        return None
+    
+    with getSession() as session:
+        caregiver = session.query(Caregiver).filter_by(userId=user.id, active=True).first()
+        return caregiver.id if caregiver else None
+
+
+def verifyCaregiverOwnership(requestedCaregiverId: int) -> bool:
+    """
+    Verify that the authenticated user owns the requested caregiver profile.
+
+    Parameters:
+        ``requestedCaregiverId`` (``int``):
+            The caregiver ID being requested.
+
+    Returns:
+        ``bool``:
+            True if the user owns the caregiver profile, False otherwise.
+    """
+    authenticatedCaregiverId = getCaregiverIdFromRequest()
+    return authenticatedCaregiverId == requestedCaregiverId
+
+
+def verifyCaregiverPatientRelationship(patientId: int) -> bool:
+    """
+    Verify that the patient is under the care of the authenticated caregiver.
+
+    Parameters:
+        ``patientId`` (``int``):
+            The patient ID to check.
+
+    Returns:
+        ``bool``:
+            True if the patient is under the caregiver's care, False otherwise.
+    """
+    if not (caregiverId := getCaregiverIdFromRequest()):
+        return False
+    
+    with getSession() as session:
+        relationship = session.query(CaregiverPatient).filter_by(
+            caregiverId=caregiverId,
+            patientId=patientId
+        ).first()
+        return relationship is not None
+
+
+def verifyScheduleAccess(scheduleId: int) -> bool:
+    """
+    Verify that the authenticated caregiver has access to the requested schedule
+    (i.e., the schedule belongs to a patient under their care).
+
+    Parameters:
+        ``scheduleId`` (``int``):
+            The schedule ID to check.
+
+    Returns:
+        ``bool``:
+            True if the caregiver has access, False otherwise.
+    """    
+    if not (caregiverId := getCaregiverIdFromRequest()):
+        return False
+    
+    with getSession() as session:
+        return session.query(
+            sa.exists().where(
+                sa.and_(
+                    PatientSchedule.scheduleId == scheduleId,
+                    CaregiverPatient.patientId == PatientSchedule.patientId,
+                    CaregiverPatient.caregiverId == caregiverId
+                )
+            )
+        ).scalar()
+
+
+def verifyPillAccess(pillId: int) -> bool:
+    """
+    Verify that the authenticated caregiver has access to the requested pill
+    (i.e., the pill is prescribed to a patient under their care).
+
+    Parameters:
+        ``pillId`` (``int``):
+            The pill ID to check.
+
+    Returns:
+        ``bool``:
+            True if the caregiver has access, False otherwise.
+    """   
+    if not (caregiverId := getCaregiverIdFromRequest()):
+        return False
+    
+    with getSession() as session:
+        return session.query(
+            sa.exists().where(
+                sa.and_(
+                    Dose.pillId == pillId,
+                    Dose.active == True,
+                    ScheduleDoses.doseId == Dose.id,
+                    PatientSchedule.scheduleId == ScheduleDoses.scheduleId,
+                    CaregiverPatient.patientId == PatientSchedule.patientId,
+                    CaregiverPatient.caregiverId == caregiverId
+                )
+            )
+        ).scalar()
+
+
+def verifyDoseAccess(doseId: int) -> bool:
+    """
+    Verify that the authenticated caregiver has access to the requested dose
+    (i.e., the dose is part of a schedule for a patient under their care).
+
+    Parameters:
+        ``doseId`` (``int``):
+            The dose ID to check.
+
+    Returns:
+        ``bool``:
+            True if the caregiver has access, False otherwise.
+    """
+    if not (caregiverId := getCaregiverIdFromRequest()):
+        return False
+    
+    with getSession() as session:
+        return session.query(
+            sa.exists().where(
+                sa.and_(
+                    ScheduleDoses.doseId == doseId,
+                    PatientSchedule.scheduleId == ScheduleDoses.scheduleId,
+                    CaregiverPatient.patientId == PatientSchedule.patientId,
+                    CaregiverPatient.caregiverId == caregiverId
+                )
+            )
+        ).scalar()
+
+
+def verifyDoseHistoryAccess(entryId: int) -> bool:
+    """
+    Verify that the authenticated caregiver has access to the requested dose history entry
+    (i.e., the entry belongs to a patient under their care).
+
+    Parameters:
+        ``entryId`` (``int``):
+            The dose history entry ID to check.
+
+    Returns:
+        ``bool``:
+            True if the caregiver has access, False otherwise.
+    """
+    if not (caregiverId := getCaregiverIdFromRequest()):
+        return False
+    
+    with getSession() as session:
+        entry = session.query(DoseHistory).filter_by(id=entryId, active=True).first()
+        if not entry:
+            return False
+        
+        return verifyCaregiverPatientRelationship(entry.patientId)
