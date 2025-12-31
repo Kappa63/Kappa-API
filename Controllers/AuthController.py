@@ -2,14 +2,14 @@ from Utils.Helpers.AuthHelpers import hashPass, verifyPass
 from .DBController import getSession
 from Models import User
 
-def _registerUser(uname: str, pwd: str) -> tuple[dict, int]:
+def _registerUser(username: str, password: str) -> tuple[dict, int]:
     """
     Creates a new user
 
     Parameters:
-        ``uname`` (``str``):
+        ``username`` (``str``):
             username
-        ``pwd`` (``str``):
+        ``password`` (``str``):
             password
     Returns:
         ``tuple``:
@@ -18,23 +18,23 @@ def _registerUser(uname: str, pwd: str) -> tuple[dict, int]:
             - int: HTTP status code
     """
     with getSession() as session:
-        if session.query(User).filter_by(username=uname).first():
+        if session.query(User).filter_by(username=username).first():
             return {"error": "User already exists"}, 409
-        newUser = User(username=uname, passwordHash=hashPass(pwd))
+        newUser = User(username=username, passwordHash=hashPass(password))
         session.add(newUser)
         session.flush()
         return {"id": newUser.id, "apiKey": newUser.apiKey, 
                 "username": newUser.username, "perms": newUser.perms,
                 "createdOn": newUser.createdOn}, 201
     
-def _loginUser(uname: str, pwd: str) -> tuple[dict, int]:
+def _loginUser(username: str, password: str) -> tuple[dict, int]:
     """
     Returns user data
 
     Parameters:
-        ``uname`` (``str``):
+        ``username`` (``str``):
             username
-        ``pwd`` (``str``):
+        ``password`` (``str``):
             password
     Returns:
         ``tuple``:
@@ -43,9 +43,9 @@ def _loginUser(uname: str, pwd: str) -> tuple[dict, int]:
             - int: HTTP status code
     """
     with getSession() as session:
-        if not (user := session.query(User).filter_by(username=uname).first()):
+        if not (user := session.query(User).filter_by(username=username).first()):
             return {"error": "User does not exist"}, 404
-        if (verifyPass(pwd, user.passwordHash)): # type: ignore
+        if (verifyPass(password, user.passwordHash)): # type: ignore
             return {"id": user.id, "apiKey": user.apiKey, 
                     "username": user.username, "perms": user.perms,
                     "createdOn": user.createdOn, "updatedOn": user.updatedOn,

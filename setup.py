@@ -38,4 +38,4 @@ baseBP.register_blueprint(doseGuardBP, url_prefix="/doseguard")
 app.register_blueprint(baseBP)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=8080 )
