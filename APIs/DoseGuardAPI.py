@@ -75,7 +75,6 @@ def attachDoseToSchedule():
     data = request.json or {}
     fields = [("scheduleId", int, True), ("doseId", int, True)]
     
-    # Verify access to the schedule
     if not verifyScheduleAccess(data.get("scheduleId")):
         return jsonify(error="Forbidden: You can only modify schedules for patients under your care"), 403
 
@@ -85,10 +84,10 @@ def attachDoseToSchedule():
 @Authorize(Permissions.PRIVATE)
 @Ratelimited
 def attachScheduleToPatient():
+    print("hello")
     data = request.json or {}
     fields = [("patientId", int, True), ("scheduleId", int, True)]
     
-    # Verify access to the patient
     if not verifyCaregiverPatientRelationship(data.get("patientId")):
         return jsonify(error="Forbidden: You can only modify schedules for patients under your care"), 403
 
@@ -101,7 +100,6 @@ def attachPatientToCaregiver():
     data = request.json or {}
     fields = [("caregiverId", int, True), ("patientId", int, True)]
     
-    # Verify the caregiver owns the caregiverId being modified
     if not verifyCaregiverOwnership(data.get("caregiverId")):
         return jsonify(error="Forbidden: You can only attach patients to your own caregiver profile"), 403
 
@@ -114,7 +112,6 @@ def createDoseHistory():
     data = request.json or {}
     fields = [("patientId", int, True), ("doseId", int, True), ("taken", bool, True)]
     
-    # Verify the patient is under the caregiver's care
     if not verifyCaregiverPatientRelationship(data.get("patientId")):
         return jsonify(error="Forbidden: You can only create dose history for patients under your care"), 403
 

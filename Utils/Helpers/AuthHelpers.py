@@ -1,5 +1,4 @@
 from Models import PatientSchedule, CaregiverPatient, Caregiver, Dose, ScheduleDoses, DoseHistory
-from Controllers.DBController import getSession
 from Utils.Enums import Permissions
 from Config import APIConfig
 from flask import g
@@ -68,6 +67,8 @@ def getCaregiverIdFromRequest():
         ``int | None``:
             The caregiver ID if found, None otherwise.
     """
+    from Controllers.DBController import getSession
+    
     if not (user := getattr(g, "user", None)):
         return None
     
@@ -104,6 +105,8 @@ def verifyCaregiverPatientRelationship(patientId: int) -> bool:
         ``bool``:
             True if the patient is under the caregiver's care, False otherwise.
     """
+    from Controllers.DBController import getSession
+    
     if not (caregiverId := getCaregiverIdFromRequest()):
         return False
     
@@ -128,6 +131,8 @@ def verifyScheduleAccess(scheduleId: int) -> bool:
         ``bool``:
             True if the caregiver has access, False otherwise.
     """    
+    from Controllers.DBController import getSession
+    
     if not (caregiverId := getCaregiverIdFromRequest()):
         return False
     
@@ -156,6 +161,8 @@ def verifyPillAccess(pillId: int) -> bool:
         ``bool``:
             True if the caregiver has access, False otherwise.
     """   
+    from Controllers.DBController import getSession
+    
     if not (caregiverId := getCaregiverIdFromRequest()):
         return False
     
@@ -187,6 +194,8 @@ def verifyDoseAccess(doseId: int) -> bool:
         ``bool``:
             True if the caregiver has access, False otherwise.
     """
+    from Controllers.DBController import getSession
+    
     if not (caregiverId := getCaregiverIdFromRequest()):
         return False
     
@@ -216,6 +225,8 @@ def verifyDoseHistoryAccess(entryId: int) -> bool:
         ``bool``:
             True if the caregiver has access, False otherwise.
     """
+    from Controllers.DBController import getSession
+    
     if not (caregiverId := getCaregiverIdFromRequest()):
         return False
     
