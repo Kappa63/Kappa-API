@@ -23,7 +23,7 @@ class User(BaseAuditEntity):
             "apiKey": self.apiKey
         }
     
-    caregiverProfile = sa.orm.relationship("Caregiver", uselist=False, back_populates="user")
+    caregiverProfile = sa.orm.relationship("Caregiver", uselist=False, back_populates="user", foreign_keys="Caregiver.userId")
 
 class DetachedUser:
     def __init__(self, user: User) -> None:

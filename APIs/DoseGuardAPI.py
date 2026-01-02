@@ -47,8 +47,9 @@ def createPatient():
 def createPill():
     data = request.json or {}
     fields = [("name", str, True), ("strength", float, True)]
+    caregiverId = getCaregiverIdFromRequest()
 
-    return handleKwargsEndpoint(data, fields, _createPill)
+    return handleKwargsEndpoint(data, fields, lambda **kw: _createPill(**kw, createdBy=caregiverId))
 
 @doseGuardBP.route("/doses", methods=["POST"])
 @Authorize(Permissions.PRIVATE)
@@ -56,8 +57,9 @@ def createPill():
 def createDose():
     data = request.json or {}
     fields = [("pillId", int, True), ("interval", int, True), ("amount", int, True)]
+    caregiverId = getCaregiverIdFromRequest()
 
-    return handleKwargsEndpoint(data, fields, _createDose)
+    return handleKwargsEndpoint(data, fields, lambda **kw: _createDose(**kw, createdBy=caregiverId))
 
 @doseGuardBP.route("/schedules", methods=["POST"])
 @Authorize(Permissions.PRIVATE)
@@ -65,8 +67,9 @@ def createDose():
 def createSchedule():
     data = request.json or {}
     fields = [("name", str, True)]
+    caregiverId = getCaregiverIdFromRequest()
 
-    return handleKwargsEndpoint(data, fields, _createSchedule)
+    return handleKwargsEndpoint(data, fields, lambda **kw: _createSchedule(**kw, createdBy=caregiverId))
 
 @doseGuardBP.route("/schedules/doses", methods=["POST"])
 @Authorize(Permissions.PRIVATE)
@@ -111,11 +114,12 @@ def attachPatientToCaregiver():
 def createDoseHistory():
     data = request.json or {}
     fields = [("patientId", int, True), ("doseId", int, True), ("taken", bool, True)]
+    caregiverId = getCaregiverIdFromRequest()
     
     if not verifyCaregiverPatientRelationship(data.get("patientId")):
         return jsonify(error="Forbidden: You can only create dose history for patients under your care"), 403
 
-    return handleKwargsEndpoint(data, fields, _createDoseHistory)
+    return handleKwargsEndpoint(data, fields, lambda **kw: _createDoseHistory(**kw, createdBy=caregiverId))
 
 ### GET ###
 @doseGuardBP.route("/caregivers/<int:caregiverId>", methods=["GET"])

@@ -12,7 +12,7 @@ class Caregiver(BaseAuditEntity):
 
     name = sa.Column(sa.String(50), nullable=False)
 
-    user = sa.orm.relationship("User", back_populates="caregiverProfile")
+    user = sa.orm.relationship("User", foreign_keys=[userId], back_populates="caregiverProfile")
     patients = sa.orm.relationship("Patient", secondary=DoseGuardConfig.SQL_CAREGIVER_PATIENT_TABLE, back_populates="caregivers")
 
     def toDict(self):

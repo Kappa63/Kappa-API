@@ -22,7 +22,7 @@ def _registerCaregiver(name: str, username: str, password: str) -> ResponsePaylo
 
 def _loginCaregiver(username: str, password: str) -> tuple[dict, int]:
     with getSession() as session:
-        caregiver = session.query(Caregiver).join(User).filter(User.username == username).first()
+        caregiver = session.query(Caregiver).join(User, Caregiver.userId == User.id).filter(User.username == username).first()
         
         if not caregiver:
             return {"error": "Caregiver does not exist"}, 404
@@ -45,30 +45,40 @@ def _loginCaregiver(username: str, password: str) -> tuple[dict, int]:
 
 def _createPatient(name: str, contact: str = None, dob: str = None,
                    weight: float = None, height: float = None) -> ResponsePayload:
+    parsedDob = None
+    if dob:
+        if dob.isdigit():
+            parsedDob = datetime.fromtimestamp(int(dob)).date()
+        else:
+            parsedDob = datetime.fromisoformat(dob).date()
+    
     return createInDB(Patient(
         name=name,
         contact=contact,
-        dob=datetime.fromisoformat(dob).date() if dob else None,
+        dob=parsedDob,
         weight=weight,
         height=height
     )), 201
     
-def _createPill(name: str, strength: float) -> ResponsePayload:
+def _createPill(name: str, strength: float, createdBy: int = None) -> ResponsePayload:
     return createInDB(Pill(
         name=name,
-        strength=strength
+        strength=strength,
+        createdBy=createdBy
     )), 201
     
-def _createDose(pillId: int, interval: int, amount: int) -> ResponsePayload:
+def _createDose(pillId: int, interval: int, amount: int, createdBy: int = None) -> ResponsePayload:
     return createInDB(Dose(
         pillId=pillId,
         interval=interval,
-        amount=amount
+        amount=amount,
+        createdBy=createdBy
     )), 201
 
-def _createSchedule(name: str) -> ResponsePayload:
+def _createSchedule(name: str, createdBy: int = None) -> ResponsePayload:
     return createInDB(Schedule(
-        name=name
+        name=name,
+        createdBy=createdBy
     )), 201
     
 def _attachDoseToSchedule(scheduleId: int, doseId: int) -> ResponsePayload:
@@ -89,11 +99,12 @@ def _attachPatientToCaregiver(caregiverId: int, patientId: int) -> ResponsePaylo
         patientId=patientId
     )), 201
     
-def _createDoseHistory(patientId: int, doseId: int, taken: bool) -> ResponsePayload:
+def _createDoseHistory(patientId: int, doseId: int, taken: bool, createdBy: int = None) -> ResponsePayload:
     return createInDB(DoseHistory(
         patientId=patientId,
         doseId=doseId,
-        taken=taken
+        taken=taken,
+        createdBy=createdBy
     )), 201
 
 ### DELETE ###

@@ -26,4 +26,5 @@ class DoseHistory(BaseAuditEntity):
             "active": self.active,
             "createdOn": self.createdOn,
             "updatedOn": self.updatedOn,
+            "createdBy": self.createdBy,
         }

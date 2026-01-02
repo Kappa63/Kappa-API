@@ -1,4 +1,4 @@
-from Models import PatientSchedule, CaregiverPatient, Caregiver, Dose, ScheduleDoses, DoseHistory
+from Models import PatientSchedule, CaregiverPatient, Caregiver, Dose, ScheduleDoses, DoseHistory, Schedule, Pill
 from Utils.Enums import Permissions
 from Config import APIConfig
 from flask import g
@@ -120,8 +120,7 @@ def verifyCaregiverPatientRelationship(patientId: int) -> bool:
 
 def verifyScheduleAccess(scheduleId: int) -> bool:
     """
-    Verify that the authenticated caregiver has access to the requested schedule
-    (i.e., the schedule belongs to a patient under their care).
+    Verify that the authenticated caregiver owns the requested schedule.
 
     Parameters:
         ``scheduleId`` (``int``):
@@ -129,7 +128,7 @@ def verifyScheduleAccess(scheduleId: int) -> bool:
 
     Returns:
         ``bool``:
-            True if the caregiver has access, False otherwise.
+            True if the caregiver owns the schedule, False otherwise.
     """    
     from Controllers.DBController import getSession
     
@@ -137,21 +136,15 @@ def verifyScheduleAccess(scheduleId: int) -> bool:
         return False
     
     with getSession() as session:
-        return session.query(
-            sa.exists().where(
-                sa.and_(
-                    PatientSchedule.scheduleId == scheduleId,
-                    CaregiverPatient.patientId == PatientSchedule.patientId,
-                    CaregiverPatient.caregiverId == caregiverId
-                )
-            )
-        ).scalar()
+        schedule = session.get(Schedule, scheduleId)
+        if not schedule or not schedule.active:
+            return False
+        return schedule.createdBy == caregiverId
 
 
 def verifyPillAccess(pillId: int) -> bool:
     """
-    Verify that the authenticated caregiver has access to the requested pill
-    (i.e., the pill is prescribed to a patient under their care).
+    Verify that the authenticated caregiver owns the requested pill.
 
     Parameters:
         ``pillId`` (``int``):
@@ -159,7 +152,7 @@ def verifyPillAccess(pillId: int) -> bool:
 
     Returns:
         ``bool``:
-            True if the caregiver has access, False otherwise.
+            True if the caregiver owns the pill, False otherwise.
     """   
     from Controllers.DBController import getSession
     
@@ -167,24 +160,15 @@ def verifyPillAccess(pillId: int) -> bool:
         return False
     
     with getSession() as session:
-        return session.query(
-            sa.exists().where(
-                sa.and_(
-                    Dose.pillId == pillId,
-                    Dose.active == True,
-                    ScheduleDoses.doseId == Dose.id,
-                    PatientSchedule.scheduleId == ScheduleDoses.scheduleId,
-                    CaregiverPatient.patientId == PatientSchedule.patientId,
-                    CaregiverPatient.caregiverId == caregiverId
-                )
-            )
-        ).scalar()
+        pill = session.get(Pill, pillId)
+        if not pill or not pill.active:
+            return False
+        return pill.createdBy == caregiverId
 
 
 def verifyDoseAccess(doseId: int) -> bool:
     """
-    Verify that the authenticated caregiver has access to the requested dose
-    (i.e., the dose is part of a schedule for a patient under their care).
+    Verify that the authenticated caregiver owns the requested dose.
 
     Parameters:
         ``doseId`` (``int``):
@@ -192,7 +176,7 @@ def verifyDoseAccess(doseId: int) -> bool:
 
     Returns:
         ``bool``:
-            True if the caregiver has access, False otherwise.
+            True if the caregiver owns the dose, False otherwise.
     """
     from Controllers.DBController import getSession
     
@@ -200,16 +184,10 @@ def verifyDoseAccess(doseId: int) -> bool:
         return False
     
     with getSession() as session:
-        return session.query(
-            sa.exists().where(
-                sa.and_(
-                    ScheduleDoses.doseId == doseId,
-                    PatientSchedule.scheduleId == ScheduleDoses.scheduleId,
-                    CaregiverPatient.patientId == PatientSchedule.patientId,
-                    CaregiverPatient.caregiverId == caregiverId
-                )
-            )
-        ).scalar()
+        dose = session.get(Dose, doseId)
+        if not dose or not dose.active:
+            return False
+        return dose.createdBy == caregiverId
 
 
 def verifyDoseHistoryAccess(entryId: int) -> bool:
