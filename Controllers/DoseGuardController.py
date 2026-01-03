@@ -9,6 +9,12 @@ from datetime import datetime
 
 ### CREATE ###
 def _registerCaregiver(name: str, username: str, password: str) -> ResponsePayload:
+    # Check if username already exists
+    with getSession() as session:
+        existingUser = session.query(User).filter_by(username=username).first()
+        if existingUser:
+            return {"error": "Username already exists"}, 409
+    
     user = createInDB(User(
         username=username, 
         passwordHash=hashPass(password), 

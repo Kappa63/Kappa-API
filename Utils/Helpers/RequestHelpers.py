@@ -130,7 +130,7 @@ def handleKwargsEndpoint(data, fields, handler):
     """
     final, err, code = validateFields(data, fields)
     if err:
-        return jsonify(err), code
+        return err, code  # err is already a jsonify() response
 
     response, code = handler(**final)
     return jsonify(response), code
@@ -154,7 +154,7 @@ def handleDictEndpoint(data, fields, handler):
     """
     final, err, code = validateFields(data, fields)
     if err:
-        return jsonify(err), code
+        return err, code  # err is already a jsonify() response
 
     response, code = handler(final)
     return jsonify(response), code
