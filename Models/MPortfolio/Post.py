@@ -11,6 +11,7 @@ class Post(BaseAuditEntity):
     title = sa.Column(sa.String, nullable=False)
     description = sa.Column(sa.String, nullable=False)
     category = sa.Column(sa.String, nullable=False)
+    order = sa.Column(sa.Integer, nullable=False, default=0)
     # state was renamed to active in BaseAuditEntity
 
 class DetachedPost:

@@ -1,5 +1,6 @@
 from .User import User, DetachedUser
 from .MPortfolio.Post import Post
+from .MPortfolio.General import General
 
 from .DoseGuard.CaregiverPatient import CaregiverPatient
 from .DoseGuard.PatientSchedule import PatientSchedule
@@ -16,6 +17,7 @@ __all__ = [
     "User",
     "DetachedUser",
     "Post",
+    "General",
 
     # DoseGuard models
     "Caregiver",
