@@ -15,7 +15,7 @@ from APIs.UserAPI import userBP
 from APIs.DoseGuardAPI import doseGuardBP
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:63342", "http://127.0.0.1:3000", "http://127.0.0.1:5500", "https://sweets.qiblawi.dev"])
+CORS(app, origins=["https://sweets.qiblawi.dev"])
 
 redisClient = Redis(host="0.0.0.0", port=6379)
 Ratelimiter.init_app(app)
