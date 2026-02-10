@@ -14,6 +14,19 @@ class Post(BaseAuditEntity):
     order = sa.Column(sa.Integer, nullable=False, default=0)
     # state was renamed to active in BaseAuditEntity
 
+    def toDict(self):
+        return {
+            "id": self.id,
+            "imageURL": self.imageURL,
+            "title": self.title,
+            "description": self.description,
+            "category": self.category,
+            "order": self.order,
+            "active": self.active,
+            "createdOn": self.createdOn,
+            "updatedOn": self.updatedOn
+        }
+
 class DetachedPost:
     def __init__(self, post: Post) -> None:
         self.imageURL = post.imageURL

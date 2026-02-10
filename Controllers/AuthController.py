@@ -1,4 +1,5 @@
 from Utils.Helpers.AuthHelpers import hashPass, verifyPass
+from Utils.Helpers.DBHelpers import createInDB
 from .DBController import getSession
 from Models import User
 
@@ -20,12 +21,11 @@ def _registerUser(username: str, password: str) -> tuple[dict, int]:
     with getSession() as session:
         if session.query(User).filter_by(username=username).first():
             return {"error": "User already exists"}, 409
-        newUser = User(username=username, passwordHash=hashPass(password))
-        session.add(newUser)
-        session.flush()
-        return {"id": newUser.id, "apiKey": newUser.apiKey, 
-                "username": newUser.username, "perms": newUser.perms,
-                "createdOn": newUser.createdOn}, 201
+    
+    return createInDB(User(
+        username=username, 
+        passwordHash=hashPass(password)
+    )), 201
     
 def _loginUser(username: str, password: str) -> tuple[dict, int]:
     """

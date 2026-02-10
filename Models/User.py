@@ -20,7 +20,10 @@ class User(BaseAuditEntity):
             "id": self.id,
             "username": self.username,
             "perms": self.perms,
-            "apiKey": self.apiKey
+            "apiKey": self.apiKey,
+            "createdOn": self.createdOn,
+            "updatedOn": self.updatedOn,
+            "lastUse": self.lastUse
         }
     
     caregiverProfile = sa.orm.relationship("Caregiver", uselist=False, back_populates="user", foreign_keys="Caregiver.userId")

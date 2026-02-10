@@ -1,6 +1,7 @@
 from werkzeug.datastructures import FileStorage
 from datetime import datetime, timezone
 from .DBController import getSession
+from Utils.Helpers.DBHelpers import listFromDB, updateInDB, softDeleteFromDB, createInDB
 from Config import MPortfolioConfig
 from Models import Post, General
 import uuid
@@ -24,7 +25,7 @@ def _uploadImage(img:FileStorage) -> tuple[bool, int]:
     img.save(fn)
     return {"filename":fn}, 201
 
-def _listPosts() -> tuple[dict, int]:
+def _listPosts() -> tuple[list[dict], int]:
     """
     Lists all posts
 
@@ -34,47 +35,19 @@ def _listPosts() -> tuple[dict, int]:
             - list[dict] keys: `id`, `imageURL`, `title`, `description`, `category`, `state` `createdOn`, `updatedOn`
             - int: HTTP status code
     """
-    with getSession() as session:
-        posts = session.query(Post).order_by(Post.order).all()
-        return [{
-                    "id": post.id,
-                    "imageURL": post.imageURL,
-                    "title": post.title,
-                    "description": post.description,
-                    "category": post.category,
-                    "order": post.order,
-                    "active": post.active,
-                    "createdOn": post.createdOn,
-                    "updatedOn": post.updatedOn
-                } for post in posts], 200
+    return listFromDB(Post)
     
-def _updatePost(pid: int, iURL: str = None, ttl: str = None,  desc: str = None,  cat: str = None, ordr: int = None) -> tuple[dict, int]:
+def _updatePost(pid: int, updates: dict) -> tuple[dict, int]:
     """
     Updates a post
     """
-    with getSession() as session:
-        if not (post := session.query(Post).filter_by(id=pid).first()):
-            return {"error": "Post not found"}, 404
-            
-        if iURL: post.imageURL = iURL
-        if ttl: post.title = ttl
-        if desc: post.description = desc
-        if cat: post.category = cat
-        if ordr is not None: post.order = ordr
-        
-        post.updatedOn = datetime.now(timezone.utc)
-        return {"id": post.id}, 200
+    return updateInDB(Post, pid, updates, "Post not found")
 
 def _deletePost(pid: int) -> tuple[dict, int]:
     """
     Deletes a post
     """
-    with getSession() as session:
-        if not (post := session.query(Post).filter_by(id=pid).first()):
-            return {"error": "Post not found"}, 404
-        
-        session.delete(post)
-        return {"message": "Post deleted"}, 200
+    return softDeleteFromDB(Post, pid, "Post not found")
 
 def _reorderPosts(order_map: dict) -> tuple[dict, int]:
     """
@@ -129,9 +102,11 @@ def _createPost(imageURL: str, title: str,  description: str,  category: str) ->
     with getSession() as session:
         # Get max order to append to end
         max_order = session.query(sa.func.max(Post.order)).scalar() or 0
-        newPost = Post(imageURL=imageURL, title=title, description=description, category=category, order=max_order+1)
-        session.add(newPost)
-        session.flush()
-        return {"id": newPost.id, "imageURL": newPost.imageURL, 
-                "title": newPost.title, "description": newPost.description,
-                "category": newPost.category, "order": newPost.order, "active": newPost.active}, 201
+    
+    return createInDB(Post(
+        imageURL=imageURL, 
+        title=title, 
+        description=description, 
+        category=category, 
+        order=max_order+1
+    )), 201
