@@ -15,7 +15,7 @@ from APIs.UserAPI import userBP
 from APIs.DoseGuardAPI import doseGuardBP
 
 app = Flask(__name__)
-CORS(app, origins=["https://sweets.qiblawi.dev"])
+CORS(app, origins=["*"]) # https://sweets.qiblawi.dev
 
 redisClient = Redis(host="0.0.0.0", port=6379)
 Ratelimiter.init_app(app)
@@ -39,4 +39,4 @@ baseBP.register_blueprint(mPortfolioBP, url_prefix="/mportfolio")
 app.register_blueprint(baseBP)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080 )
+    app.run(host="0.0.0.0", port=5000 )

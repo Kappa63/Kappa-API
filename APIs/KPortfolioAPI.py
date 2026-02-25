@@ -1,4 +1,4 @@
-from Controllers.MPortfolioController import (_uploadImage, _listPosts, _createPost, _updatePost, 
+from Controllers.KPortfolioController import (_uploadImage, _listPosts, _createPost, _updatePost, 
                                             _deletePost, _reorderPosts, _getGeneral, _updateGeneral)
 from Utils.Helpers.RequestHelpers import handleKwargsEndpoint
 from flask import Blueprint, jsonify, request
@@ -8,9 +8,9 @@ from Utils.Enums import Permissions
 from Utils.Helpers.DBHelpers import softDeleteFromDB
 from Models import Post
 
-mPortfolioBP = Blueprint("mportfolio", __name__)
+kPortfolioBP = Blueprint("kportfolio", __name__)
 
-@mPortfolioBP.route("/image", methods=["POST"])
+@kPortfolioBP.route("/image", methods=["POST"])
 @Authorize(Permissions.ADMIN)
 def uploadImage():
     if not (img := request.files.get("image")):
@@ -19,7 +19,7 @@ def uploadImage():
     response, code = _uploadImage(img)
     return jsonify(response), code
 
-@mPortfolioBP.route("/posts", methods=["POST"])
+@kPortfolioBP.route("/posts", methods=["POST"])
 @Authorize(Permissions.ADMIN)
 def createPost(): 
     data = request.json or {}
@@ -27,20 +27,20 @@ def createPost():
 
     return handleKwargsEndpoint(data, fields, _createPost)
 
-@mPortfolioBP.route("/content", methods=["GET"])
+@kPortfolioBP.route("/content", methods=["GET"])
 def getContent():
     posts, _ = _listPosts()
     general, _ = _getGeneral()
     return jsonify({"posts": posts, "general": general}), 200
 
-@mPortfolioBP.route("/general", methods=["POST"])
+@kPortfolioBP.route("/general", methods=["POST"])
 @Authorize(Permissions.ADMIN)
 def updateGeneral():
     data = request.json or {}
     response, code = _updateGeneral(data)
     return jsonify(response), code
 
-@mPortfolioBP.route("/posts/reorder", methods=["POST"])
+@kPortfolioBP.route("/posts/reorder", methods=["POST"])
 @Authorize(Permissions.ADMIN)
 def reorderPosts():
     data = request.json or {}
@@ -50,7 +50,7 @@ def reorderPosts():
     response, code = _reorderPosts(order_map)
     return jsonify(response), code
 
-@mPortfolioBP.route("/posts/<int:pid>", methods=["PUT"])
+@kPortfolioBP.route("/posts/<int:pid>", methods=["PUT"])
 @Authorize(Permissions.ADMIN)
 def updatePost(pid):
     data = request.json or {}
@@ -58,7 +58,7 @@ def updatePost(pid):
     
     return handleKwargsEndpoint(data, fields, lambda **upd: _updatePost(pid, upd))
 
-@mPortfolioBP.route("/posts/<int:pid>", methods=["DELETE"])
+@kPortfolioBP.route("/posts/<int:pid>", methods=["DELETE"])
 @Authorize(Permissions.ADMIN)
 def delPost(pid):
     response, code = softDeleteFromDB(Post, pid, "Post not found")

@@ -2,7 +2,7 @@ from werkzeug.datastructures import FileStorage
 from datetime import datetime, timezone
 from .DBController import getSession
 from Utils.Helpers.DBHelpers import listFromDB, updateInDB, softDeleteFromDB, createInDB
-from Config import MPortfolioConfig
+from Config import KPortfolioConfig
 from Models import Post, General
 import uuid
 import os
@@ -21,7 +21,7 @@ def _uploadImage(img:FileStorage) -> tuple[bool, int]:
             - dict keys: `filename`
             - int: HTTP status code
     """
-    fn = os.path.join(MPortfolioConfig.PORTFOLIO_UPLOADS_FOLDER, f"{uuid.uuid4()}.jpg")
+    fn = os.path.join(KPortfolioConfig.PORTFOLIO_UPLOADS_FOLDER, f"{uuid.uuid4()}.jpg")
     img.save(fn)
     return {"filename":fn}, 201
 
