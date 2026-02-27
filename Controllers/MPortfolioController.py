@@ -1,7 +1,7 @@
 from werkzeug.datastructures import FileStorage
 from datetime import datetime, timezone
 from .DBController import getSession
-from Utils.Helpers.DBHelpers import listFromDB, updateInDB, softDeleteFromDB, createInDB
+from Utils.Helpers.DBHelpers import listFromDB, updateInDB, createInDB
 from Config import MPortfolioConfig
 from Models import Post, General
 import uuid
@@ -43,12 +43,6 @@ def _updatePost(pid: int, updates: dict) -> tuple[dict, int]:
     """
     return updateInDB(Post, pid, updates, "Post not found")
 
-def _deletePost(pid: int) -> tuple[dict, int]:
-    """
-    Deletes a post
-    """
-    return softDeleteFromDB(Post, pid, "Post not found")
-
 def _reorderPosts(order_map: dict) -> tuple[dict, int]:
     """
     Updates the order of multiple posts
@@ -86,7 +80,7 @@ def _updateGeneral(data: dict) -> tuple[dict, int]:
     
 def _createPost(imageURL: str, title: str,  description: str,  category: str) -> tuple[dict, int]:
     """
-    Creates a new user
+    Creates a new post
 
     Parameters:
         ``iURL`` (``str``):

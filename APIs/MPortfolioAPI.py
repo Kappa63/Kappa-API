@@ -1,9 +1,8 @@
 from Controllers.MPortfolioController import (_uploadImage, _listPosts, _createPost, _updatePost, 
-                                            _deletePost, _reorderPosts, _getGeneral, _updateGeneral)
+                                              _reorderPosts, _getGeneral, _updateGeneral)
 from Utils.Helpers.RequestHelpers import handleKwargsEndpoint
 from flask import Blueprint, jsonify, request
 from Utils.Decorators import Authorize
-from Utils.Types import FileStorage
 from Utils.Enums import Permissions
 from Utils.Helpers.DBHelpers import softDeleteFromDB
 from Models import Post

@@ -1,6 +1,11 @@
 from .User import User, DetachedUser
+
 from .MPortfolio.Post import Post
 from .MPortfolio.General import General
+
+from .KPortfolio.Experience import Experience
+from .KPortfolio.Project import Project
+from .KPortfolio.Skill import Skill
 
 from .DoseGuard.CaregiverPatient import CaregiverPatient
 from .DoseGuard.PatientSchedule import PatientSchedule
@@ -16,10 +21,17 @@ __all__ = [
     "Base",
     "User",
     "DetachedUser",
+
+    # MPortfolio Models
     "Post",
     "General",
 
-    # DoseGuard models
+    # KPortfolio Models
+    "Experience",
+    "Project",
+    "Skill",
+
+    # DoseGuard Models
     "Caregiver",
     "CaregiverPatient",
     "Patient",

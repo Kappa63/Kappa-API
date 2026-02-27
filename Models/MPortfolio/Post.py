@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 from Config import MPortfolioConfig
-from Config import MPortfolioConfig
 from ..BaseAuditEntity import BaseAuditEntity
 import sqlalchemy as sa
 
@@ -12,7 +11,6 @@ class Post(BaseAuditEntity):
     description = sa.Column(sa.String, nullable=False)
     category = sa.Column(sa.String, nullable=False)
     order = sa.Column(sa.Integer, nullable=False, default=0)
-    # state was renamed to active in BaseAuditEntity
 
     def toDict(self):
         return {

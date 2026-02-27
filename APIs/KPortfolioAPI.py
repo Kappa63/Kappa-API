@@ -1,12 +1,13 @@
-from Controllers.KPortfolioController import (_uploadImage, _listPosts, _createPost, _updatePost, 
-                                            _deletePost, _reorderPosts, _getGeneral, _updateGeneral)
+from Controllers.KPortfolioController import (_uploadImage, _listExperiences, _createExperience, _updateExperience, 
+                                              _listSkills, _createSkill, _updateSkill, _listProjects, _createProject,
+                                              _updateProject)
 from Utils.Helpers.RequestHelpers import handleKwargsEndpoint
 from flask import Blueprint, jsonify, request
 from Utils.Decorators import Authorize
-from Utils.Types import FileStorage
 from Utils.Enums import Permissions
 from Utils.Helpers.DBHelpers import softDeleteFromDB
-from Models import Post
+from Models import Experience, Skill, Project
+from datetime import date
 
 kPortfolioBP = Blueprint("kportfolio", __name__)
 
@@ -19,47 +20,78 @@ def uploadImage():
     response, code = _uploadImage(img)
     return jsonify(response), code
 
-@kPortfolioBP.route("/posts", methods=["POST"])
-@Authorize(Permissions.ADMIN)
-def createPost(): 
-    data = request.json or {}
-    fields = [("imageURL", str, True), ("title", str, True), ("description", str, True), ("category", str, True)]
-
-    return handleKwargsEndpoint(data, fields, _createPost)
-
 @kPortfolioBP.route("/content", methods=["GET"])
 def getContent():
-    posts, _ = _listPosts()
-    general, _ = _getGeneral()
-    return jsonify({"posts": posts, "general": general}), 200
+    experiences, _ = _listExperiences()
+    skills, _ = _listSkills()
+    projects, _ = _listProjects()
+    return jsonify({"experiences": experiences, "skills": skills, "projects": projects}), 200
 
-@kPortfolioBP.route("/general", methods=["POST"])
+###
+@kPortfolioBP.route("/experiences", methods=["POST"])
 @Authorize(Permissions.ADMIN)
-def updateGeneral():
+def createExperience(): 
     data = request.json or {}
-    response, code = _updateGeneral(data)
-    return jsonify(response), code
+    fields = [("role", str, True), ("company", str, True), ("startDate", date, True), ("endDate", date, False), ("highlights", str, True)]
 
-@kPortfolioBP.route("/posts/reorder", methods=["POST"])
-@Authorize(Permissions.ADMIN)
-def reorderPosts():
-    data = request.json or {}
-    # Expecting {"order_map": {id: order}}
-    if not (order_map := data.get("order_map")):
-         return jsonify({"error": "Missing 'order_map'"}), 400
-    response, code = _reorderPosts(order_map)
-    return jsonify(response), code
+    return handleKwargsEndpoint(data, fields, _createExperience)
 
-@kPortfolioBP.route("/posts/<int:pid>", methods=["PUT"])
+@kPortfolioBP.route("/experiences/<int:pid>", methods=["PUT"])
 @Authorize(Permissions.ADMIN)
-def updatePost(pid):
+def updateExperience(pid):
     data = request.json or {}
-    fields = [("imageURL", str, False), ("title", str, False), ("description", str, False), ("category", str, False), ("order", int, False)]
+    fields = [("role", str, False), ("company", str, False), ("startDate", date, False), ("endDate", date, False), ("highlights", str, False)]
     
-    return handleKwargsEndpoint(data, fields, lambda **upd: _updatePost(pid, upd))
+    return handleKwargsEndpoint(data, fields, lambda **upd: _updateExperience(pid, upd))
 
-@kPortfolioBP.route("/posts/<int:pid>", methods=["DELETE"])
+@kPortfolioBP.route("/experiences/<int:pid>", methods=["DELETE"])
 @Authorize(Permissions.ADMIN)
-def delPost(pid):
-    response, code = softDeleteFromDB(Post, pid, "Post not found")
+def delExperience(pid):
+    response, code = softDeleteFromDB(Experience, pid, "Experience not found")
+    return jsonify(response), code
+
+###
+@kPortfolioBP.route("/skills", methods=["POST"])
+@Authorize(Permissions.ADMIN)
+def createSkill(): 
+    data = request.json or {}
+    fields = [("category", str, True), ("name", str, True), ("icon", str, True)]
+
+    return handleKwargsEndpoint(data, fields, _createSkill)
+
+@kPortfolioBP.route("/skills/<int:pid>", methods=["PUT"])
+@Authorize(Permissions.ADMIN)
+def updateSkill(pid):
+    data = request.json or {}
+    fields = [("category", str, False), ("name", str, False), ("icon", str, False)]
+    
+    return handleKwargsEndpoint(data, fields, lambda **upd: _updateSkill(pid, upd))
+
+@kPortfolioBP.route("/skills/<int:pid>", methods=["DELETE"])
+@Authorize(Permissions.ADMIN)
+def delSkill(pid):
+    response, code = softDeleteFromDB(Skill, pid, "Skill not found")
+    return jsonify(response), code
+
+###
+@kPortfolioBP.route("/projects", methods=["POST"])
+@Authorize(Permissions.ADMIN)
+def createProject(): 
+    data = request.json or {}
+    fields = [("imageURL", str, True), ("title", str, True), ("description", str, True), ("link", str, False)]
+
+    return handleKwargsEndpoint(data, fields, _createProject)
+
+@kPortfolioBP.route("/projects/<int:pid>", methods=["PUT"])
+@Authorize(Permissions.ADMIN)
+def updateProject(pid):
+    data = request.json or {}
+    fields = [("imageURL", str, False), ("title", str, False), ("description", str, False), ("link", str, False)]
+    
+    return handleKwargsEndpoint(data, fields, lambda **upd: _updateProject(pid, upd))
+
+@kPortfolioBP.route("/projects/<int:pid>", methods=["DELETE"])
+@Authorize(Permissions.ADMIN)
+def delProject(pid):
+    response, code = softDeleteFromDB(Project, pid, "Project not found")
     return jsonify(response), code
