@@ -46,4 +46,5 @@ def deleteUser():
         200:
             description: Successful request
     """
-    return jsonify({}), _deleteUser(g.user)
+    response, code = _deleteUser(g.user)
+    return jsonify(response), code

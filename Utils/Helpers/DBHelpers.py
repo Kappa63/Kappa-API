@@ -151,7 +151,9 @@ def listRelatedFromDB(model, idValue: int, relationName: str, notFoundMessage: s
             - HTTP status code
     """
     with getSession() as session:
+        print(model, idValue)
         parent = session.get(model, idValue)
+        print(parent)
         if not parent or not parent.active:
             return {"error": notFoundMessage}, 404
 

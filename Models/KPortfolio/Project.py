@@ -1,16 +1,16 @@
 from datetime import datetime, timezone
-from Config import MPortfolioConfig
+from Config import KPortfolioConfig
 from ..BaseAuditEntity import BaseAuditEntity
 import sqlalchemy as sa
 
-class Post(BaseAuditEntity):
-    __tablename__ = MPortfolioConfig.SQL_PORTFOLIO_POSTS_TABLE
+class Project(BaseAuditEntity):
+    __tablename__ = KPortfolioConfig.SQL_PORTFOLIO_PROJECTS_TABLE
 
     imageURL = sa.Column(sa.String, nullable=False, unique=True)
     title = sa.Column(sa.String, nullable=False)
     description = sa.Column(sa.String, nullable=False)
-    category = sa.Column(sa.String, nullable=False)
-    order = sa.Column(sa.Integer, nullable=False, default=0)
+    link = sa.Column(sa.String, nullable=True)
+    order = sa.Column(sa.Integer, nullable=False)
 
     def toDict(self):
         return {
@@ -18,16 +18,17 @@ class Post(BaseAuditEntity):
             "imageURL": self.imageURL,
             "title": self.title,
             "description": self.description,
-            "category": self.category,
+            "link": self.link,
             "order": self.order,
             "active": self.active,
             "createdOn": self.createdOn,
             "updatedOn": self.updatedOn
         }
 
-class DetachedPost:
-    def __init__(self, post: Post) -> None:
-        self.imageURL = post.imageURL
-        self.title = post.title
-        self.description = post.description
-        self.category = post.category
+class DetachedProject:
+    def __init__(self, project: Project) -> None:
+        self.imageURL = project.imageURL
+        self.title = project.title
+        self.description = project.description
+        self.link = project.link
+        self.order = project.order

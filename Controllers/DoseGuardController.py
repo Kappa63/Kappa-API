@@ -5,9 +5,16 @@ from Controllers.DBController import getSession
 from Utils.Types import ResponsePayload
 from Utils.Enums import Permissions
 from Utils.Helpers.AuthHelpers import hashPass, verifyPass
+from datetime import datetime
 
 ### CREATE ###
-def _createCaregiver(name: str, username: str, password: str) -> ResponsePayload:
+def _registerCaregiver(name: str, username: str, password: str) -> ResponsePayload:
+    # Check if username already exists
+    with getSession() as session:
+        existingUser = session.query(User).filter_by(username=username).first()
+        if existingUser:
+            return {"error": "Username already exists"}, 409
+    
     user = createInDB(User(
         username=username, 
         passwordHash=hashPass(password), 
@@ -18,33 +25,66 @@ def _createCaregiver(name: str, username: str, password: str) -> ResponsePayload
         name=name, 
         userId=user["id"]
     )), 201
-    
-def _createPatient(name: str, contact: str = None, age: int = None,
+
+def _loginCaregiver(username: str, password: str) -> tuple[dict, int]:
+    with getSession() as session:
+        caregiver = session.query(Caregiver).join(User, Caregiver.userId == User.id).filter(User.username == username).first()
+        
+        if not caregiver:
+            return {"error": "Caregiver does not exist"}, 404
+        
+        user = caregiver.user
+        
+        if verifyPass(password, user.passwordHash): # type: ignore
+            return {
+                "id": caregiver.id,
+                "name": caregiver.name,
+                "apiKey": user.apiKey,
+                "username": user.username,
+                "perms": user.perms,
+                "createdOn": user.createdOn,
+                "updatedOn": user.updatedOn,
+                "lastUse": user.lastUse
+            }, 200
+        
+        return {"error": "Invalid credentials"}, 401
+
+def _createPatient(name: str, contact: str = None, dob: str = None,
                    weight: float = None, height: float = None) -> ResponsePayload:
+    parsedDob = None
+    if dob:
+        if dob.isdigit():
+            parsedDob = datetime.fromtimestamp(int(dob)).date()
+        else:
+            parsedDob = datetime.fromisoformat(dob).date()
+    
     return createInDB(Patient(
         name=name,
         contact=contact,
-        age=age,
+        dob=parsedDob,
         weight=weight,
         height=height
     )), 201
     
-def _createPill(name: str, strength: float) -> ResponsePayload:
+def _createPill(name: str, strength: float, createdBy: int = None) -> ResponsePayload:
     return createInDB(Pill(
         name=name,
-        strength=strength
+        strength=strength,
+        createdBy=createdBy
     )), 201
     
-def _createDose(pillId: int, interval: int, amount: int) -> ResponsePayload:
+def _createDose(pillId: int, interval: int, amount: int, createdBy: int = None) -> ResponsePayload:
     return createInDB(Dose(
         pillId=pillId,
         interval=interval,
-        amount=amount
+        amount=amount,
+        createdBy=createdBy
     )), 201
 
-def _createSchedule(name: str) -> ResponsePayload:
+def _createSchedule(name: str, createdBy: int = None) -> ResponsePayload:
     return createInDB(Schedule(
-        name=name
+        name=name,
+        createdBy=createdBy
     )), 201
     
 def _attachDoseToSchedule(scheduleId: int, doseId: int) -> ResponsePayload:
@@ -65,11 +105,12 @@ def _attachPatientToCaregiver(caregiverId: int, patientId: int) -> ResponsePaylo
         patientId=patientId
     )), 201
     
-def _createDoseHistory(patientId: int, doseId: int, taken: bool) -> ResponsePayload:
+def _createDoseHistory(patientId: int, doseId: int, taken: bool, createdBy: int = None) -> ResponsePayload:
     return createInDB(DoseHistory(
         patientId=patientId,
         doseId=doseId,
-        taken=taken
+        taken=taken,
+        createdBy=createdBy
     )), 201
 
 ### DELETE ###

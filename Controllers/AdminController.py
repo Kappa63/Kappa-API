@@ -1,6 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from .DBController import getSession
 from Utils.Enums import Permissions
+from Utils.Helpers.DBHelpers import listFromDB, updateInDB
 from Models import User
 
 def _patchUser(uid: int, newData: dict) -> tuple[dict, int]:
@@ -19,23 +20,20 @@ def _patchUser(uid: int, newData: dict) -> tuple[dict, int]:
             - dict keys: `id`, `apiKey`, `username`, `perms`, `createdOn`
             - int: HTTP status code
     """
-    with getSession() as session:
-        if not (user := session.query(User).filter_by(id=uid).first()):
-            return {"error": "User does not exist"}, 404
-        
-        if (dt := newData.get("username")):
-            exists = session.query(User).filter_by(username=dt).first()
+    updates = {}
+    
+    if (dt := newData.get("username")):
+        with getSession() as session:
+            # Check if username exists and doesn't belong to current user
+            exists = session.query(User).filter(User.username == dt, User.id != uid).first()
             if exists:
                 return {"error": "Username already exists"}, 409
-            user.username = dt
+        updates["username"] = dt
 
-        if (dt := newData.get("perms")):
-            user.perms = Permissions(int(dt)).value # type: ignore
-        user.updatedOn = datetime.now(timezone.utc) # type: ignore
+    if (dt := newData.get("perms")):
+        updates["perms"] = Permissions(int(dt)).value # type: ignore
 
-        return {"id": user.id, "apiKey": user.apiKey, 
-                "username": user.username, "perms": user.perms,
-                "createdOn": user.createdOn}, 200
+    return updateInDB(User, uid, updates, "User does not exist")
     
 def _listUsers() -> tuple[list[dict], int]:
     """
@@ -47,14 +45,4 @@ def _listUsers() -> tuple[list[dict], int]:
             - list[dict] keys: `id`, `apiKey`, `username`, `perms`, `createdOn`, `updatedOn`, `lastUse`
             - int: HTTP status code
     """
-    with getSession() as session:
-        users = session.query(User).all()
-        return [{
-                    "id": user.id,
-                    "apiKey": user.apiKey,
-                    "username": user.username,
-                    "perms": user.perms,
-                    "createdOn": user.createdOn,
-                    "updatedOn": user.updatedOn,
-                    "lastUse": user.lastUse
-                } for user in users], 200
+    return listFromDB(User)

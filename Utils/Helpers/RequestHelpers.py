@@ -1,6 +1,7 @@
 from Utils.Types import Any, Tuple, Optional, List, FieldSpec, HandlerFunc, JSONDict, Response
 from werkzeug.datastructures import FileStorage
 from flask import jsonify
+from datetime import date
 from enum import Enum
 
 def requireField(data: dict, key: str) -> Tuple[Optional[Any], Optional[Response], Optional[int]]:
@@ -51,6 +52,9 @@ def convertField(value: Any, expectedType: type, key: str):
                 return False, None, None
             return None, jsonify({"error": f"Invalid bool for field '{key}'"}), 400
 
+        if expectedType == date:
+            return date.fromisoformat(str(value)), None, None
+
         return expectedType(value), None, None
 
     except (ValueError, TypeError):
@@ -82,10 +86,14 @@ def validateFields(data: JSONDict, fields: List[FieldSpec]):
             value, err, code = requireField(data, field)
             if err:
                 return None, err, code
+            if value is None:
+                return None, jsonify({"error": f"Field '{field}' is required and cannot be null"}), 400
         else:
             if field not in data:
                 continue
             value = data[field]
+            if value is None:  # optional field explicitly set to null — exclude it
+                continue
 
         if isinstance(value, FileStorage):
             finalFields[field] = value
@@ -130,7 +138,7 @@ def handleKwargsEndpoint(data, fields, handler):
     """
     final, err, code = validateFields(data, fields)
     if err:
-        return jsonify(err), code
+        return err, code  # err is already a jsonify() response
 
     response, code = handler(**final)
     return jsonify(response), code
@@ -154,7 +162,7 @@ def handleDictEndpoint(data, fields, handler):
     """
     final, err, code = validateFields(data, fields)
     if err:
-        return jsonify(err), code
+        return err, code  # err is already a jsonify() response
 
     response, code = handler(final)
     return jsonify(response), code

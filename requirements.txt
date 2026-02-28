@@ -1,4 +1,4 @@
-Flask
+Flask[async]
 requests
 beautifulsoup4
 flasgger
@@ -8,3 +8,4 @@ gunicorn
 flask-limiter
 redis
 python-dotenv
+flask_cors

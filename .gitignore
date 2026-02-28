@@ -6,3 +6,11 @@ lib64
 include
 bin
 *.cfg
+classes_DoseGuard.html
+classes_KappaAPI_Simplified.mmd
+classes_KappaAPI.mmd
+classes_KappaAPI.png
+packages_KappaAPI_Simplified.mmd
+packages_KappaAPI.png
+packages_KappaAPI.mmd
+wrap_modules.py

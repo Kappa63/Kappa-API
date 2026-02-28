@@ -1,0 +1,5 @@
+SQL_PORTFOLIO_PROJECTS_TABLE = "kportfolio_projects"
+SQL_PORTFOLIO_SKILLS_TABLE = "kportfolio_skills"
+SQL_PORTFOLIO_EXPERIENCES_TABLE = "kportfolio_experiences"
+PORTFOLIO_UPLOADS_FOLDER = "/home/kappa/Desktop/Portfolios/Kappa-Portfolio/assets/imgs/uploads"
+# PORTFOLIO_UPLOADS_FOLDER = "/var/www/Portfolios/Kappa-Portfolio/assets/imgs/uploads"

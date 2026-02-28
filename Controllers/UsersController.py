@@ -1,5 +1,5 @@
 from Models import User, DetachedUser
-from .DBController import getSession
+from Utils.Helpers.DBHelpers import getFromDB, softDeleteFromDB
 
 def _getUser(u: DetachedUser) -> tuple[dict, int]:
     """
@@ -14,15 +14,9 @@ def _getUser(u: DetachedUser) -> tuple[dict, int]:
             - dict keys: `id`, `apiKey`, `username`, `perms`, `createdOn`, `updatedOn`, `lastUse`
             - int: HTTP status code
     """
-    with getSession() as session:
-        if not (user := session.query(User).filter_by(id=u.id).first()):
-            return {"error": "User not found"}, 404
-        return {"id": user.id, "apiKey": user.apiKey, 
-                "username": user.username, "perms": user.perms,
-                "createdOn": user.createdOn, "updatedOn": user.updatedOn,
-                "lastUse": user.lastUse}, 200
+    return getFromDB(User, u.id, "User not found")
 
-def _deleteUser(u: User) -> int:
+def _deleteUser(u: DetachedUser) -> tuple[dict, int]:
     """
     Deletes user data
 
@@ -30,12 +24,8 @@ def _deleteUser(u: User) -> int:
         ``u`` (``DetachedUser``):
             Detached user object from authorize
     Returns:
-      - int: HTTP status code
+        ``tuple``:
+             - dict: result message
+             - int: HTTP status code
     """
-    with getSession() as session:
-        if not (user := session.query(User).filter_by(id=u.id).first()):
-            return 404
-        
-        session.delete(user)
-
-        return 200
+    return softDeleteFromDB(User, u.id, "User not found")
