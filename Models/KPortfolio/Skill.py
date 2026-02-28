@@ -9,6 +9,7 @@ class Skill(BaseAuditEntity):
     category = sa.Column(sa.String, nullable=False)
     name = sa.Column(sa.String, nullable=False)
     icon = sa.Column(sa.String, nullable=True)
+    order = sa.Column(sa.Integer, nullable=False)
 
     def toDict(self):
         return {
@@ -16,6 +17,7 @@ class Skill(BaseAuditEntity):
             "category": self.category,
             "name": self.name,
             "icon": self.icon,
+            "order": self.order,
             "active": self.active,
             "createdOn": self.createdOn,
             "updatedOn": self.updatedOn
@@ -26,3 +28,4 @@ class DetachedSkill:
         self.category = skill.category
         self.name = skill.name
         self.icon = skill.icon
+        self.order = skill.order

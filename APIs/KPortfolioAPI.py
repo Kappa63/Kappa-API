@@ -55,7 +55,7 @@ def delExperience(pid):
 @Authorize(Permissions.ADMIN)
 def createSkill(): 
     data = request.json or {}
-    fields = [("category", str, True), ("name", str, True), ("icon", str, True)]
+    fields = [("category", str, True), ("name", str, True), ("icon", str, True), ("order", int, True)]
 
     return handleKwargsEndpoint(data, fields, _createSkill)
 
@@ -63,7 +63,7 @@ def createSkill():
 @Authorize(Permissions.ADMIN)
 def updateSkill(pid):
     data = request.json or {}
-    fields = [("category", str, False), ("name", str, False), ("icon", str, False)]
+    fields = [("category", str, False), ("name", str, False), ("icon", str, False), ("order", int, False)]
     
     return handleKwargsEndpoint(data, fields, lambda **upd: _updateSkill(pid, upd))
 
@@ -78,7 +78,7 @@ def delSkill(pid):
 @Authorize(Permissions.ADMIN)
 def createProject(): 
     data = request.json or {}
-    fields = [("imageURL", str, True), ("title", str, True), ("description", str, True), ("link", str, False)]
+    fields = [("imageURL", str, True), ("title", str, True), ("description", str, True), ("link", str, False), ("order", int, True)]
 
     return handleKwargsEndpoint(data, fields, _createProject)
 
@@ -86,7 +86,7 @@ def createProject():
 @Authorize(Permissions.ADMIN)
 def updateProject(pid):
     data = request.json or {}
-    fields = [("imageURL", str, False), ("title", str, False), ("description", str, False), ("link", str, False)]
+    fields = [("imageURL", str, False), ("title", str, False), ("description", str, False), ("link", str, False), ("order", int, False)]
     
     return handleKwargsEndpoint(data, fields, lambda **upd: _updateProject(pid, upd))
 

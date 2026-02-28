@@ -30,7 +30,9 @@ def _listExperiences() -> tuple[list[dict], int]:
     """
     Lists all experiences
     """
-    return listFromDB(Experience)
+    experiences = listFromDB(Experience)
+    experiences.sort(key=lambda x: x["startDate"], reverse=True)
+    return experiences
     
 def _updateExperience(pid: int, updates: dict) -> tuple[dict, int]:
     """
@@ -48,14 +50,17 @@ def _createExperience(role: str, company: str,  startDate: date, highlights: str
         company=company,
         startDate=startDate,
         endDate=endDate,
-        highlights=highlights
+        highlights=highlights,
+        # order=order
     )), 201
 
 def _listSkills() -> tuple[list[dict], int]:
     """
     Lists all skills
     """
-    return listFromDB(Skill)
+    skills = listFromDB(Skill)
+    skills.sort(key=lambda x: x["order"])
+    return skills
     
 def _updateSkill(pid: int, updates: dict) -> tuple[dict, int]:
     """
@@ -63,21 +68,24 @@ def _updateSkill(pid: int, updates: dict) -> tuple[dict, int]:
     """
     return updateInDB(Skill, pid, updates, "Experience not found")
 
-def _createSkill(category: str, name: str,  icon: str) -> tuple[dict, int]:
+def _createSkill(category: str, name: str, order: int, icon: str = None) -> tuple[dict, int]:
     """
     Creates a new skill
     """
     return createInDB(Skill(
         category=category,
         name=name,
-        icon=icon
+        icon=icon,
+        order=order
     )), 201
 
 def _listProjects() -> tuple[list[dict], int]:
     """
     Lists all projects
     """
-    return listFromDB(Project)
+    projects = listFromDB(Project)
+    projects.sort(key=lambda x: x["order"])
+    return projects
     
 def _updateProject(pid: int, updates: dict) -> tuple[dict, int]:
     """
@@ -85,7 +93,7 @@ def _updateProject(pid: int, updates: dict) -> tuple[dict, int]:
     """
     return updateInDB(Project, pid, updates, "Experience not found")
 
-def _createProject(imageURL: str, title: str,  description: str, link: str = None) -> tuple[dict, int]:
+def _createProject(imageURL: str, title: str,  description: str, order: int, link: str = None) -> tuple[dict, int]:
     """
     Creates a new project
     """
@@ -93,5 +101,6 @@ def _createProject(imageURL: str, title: str,  description: str, link: str = Non
         imageURL=imageURL,
         title=title,
         description=description,
-        link=link
+        link=link,
+        order=order
     )), 201

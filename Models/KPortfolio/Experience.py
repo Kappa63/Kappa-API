@@ -11,6 +11,7 @@ class Experience(BaseAuditEntity):
     startDate = sa.Column(sa.Date, nullable=False)
     endDate = sa.Column(sa.Date, nullable=True)
     highlights = sa.Column(sa.String, nullable=False)
+    # order = sa.Column(sa.Integer, nullable=False)
 
     def toDict(self):
         return {
@@ -20,6 +21,7 @@ class Experience(BaseAuditEntity):
             "startDate": self.startDate,
             "endDate": self.endDate,
             "highlights": self.highlights,
+            # "order": self.order,
             "active": self.active,
             "createdOn": self.createdOn,
             "updatedOn": self.updatedOn
@@ -32,3 +34,4 @@ class DetachedExperience:
         self.startDate = experience.startDate
         self.endDate = experience.endDate
         self.highlights = experience.highlights
+        # self.order = experience.order

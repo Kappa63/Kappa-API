@@ -10,6 +10,7 @@ class Project(BaseAuditEntity):
     title = sa.Column(sa.String, nullable=False)
     description = sa.Column(sa.String, nullable=False)
     link = sa.Column(sa.String, nullable=True)
+    order = sa.Column(sa.Integer, nullable=False)
 
     def toDict(self):
         return {
@@ -18,6 +19,7 @@ class Project(BaseAuditEntity):
             "title": self.title,
             "description": self.description,
             "link": self.link,
+            "order": self.order,
             "active": self.active,
             "createdOn": self.createdOn,
             "updatedOn": self.updatedOn
@@ -29,3 +31,4 @@ class DetachedProject:
         self.title = project.title
         self.description = project.description
         self.link = project.link
+        self.order = project.order
