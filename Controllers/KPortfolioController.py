@@ -38,7 +38,7 @@ def _updateExperience(pid: int, updates: dict) -> tuple[dict, int]:
     """
     return updateInDB(Experience, pid, updates, "Experience not found")
 
-def _createExperience(role: str, company: str,  startDate: date, endDate: date,  highlights: str) -> tuple[dict, int]:
+def _createExperience(role: str, company: str,  startDate: date, highlights: str, endDate: date = None) -> tuple[dict, int]:
     """
     Creates a new experience
     """
@@ -85,7 +85,7 @@ def _updateProject(pid: int, updates: dict) -> tuple[dict, int]:
     """
     return updateInDB(Project, pid, updates, "Experience not found")
 
-def _createProject(imageURL: str, title: str,  description: str, link: str) -> tuple[dict, int]:
+def _createProject(imageURL: str, title: str,  description: str, link: str = None) -> tuple[dict, int]:
     """
     Creates a new project
     """
