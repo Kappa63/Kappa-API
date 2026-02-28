@@ -30,9 +30,9 @@ def _listExperiences() -> tuple[list[dict], int]:
     """
     Lists all experiences
     """
-    experiences = listFromDB(Experience)
+    experiences, c = listFromDB(Experience)
     experiences.sort(key=lambda x: x["startDate"], reverse=True)
-    return experiences
+    return experiences, c
     
 def _updateExperience(pid: int, updates: dict) -> tuple[dict, int]:
     """
@@ -58,9 +58,9 @@ def _listSkills() -> tuple[list[dict], int]:
     """
     Lists all skills
     """
-    skills = listFromDB(Skill)
+    skills, c = listFromDB(Skill)
     skills.sort(key=lambda x: x["order"])
-    return skills
+    return skills, c
     
 def _updateSkill(pid: int, updates: dict) -> tuple[dict, int]:
     """
@@ -83,9 +83,9 @@ def _listProjects() -> tuple[list[dict], int]:
     """
     Lists all projects
     """
-    projects = listFromDB(Project)
+    projects, c = listFromDB(Project)
     projects.sort(key=lambda x: x["order"])
-    return projects
+    return projects, c
     
 def _updateProject(pid: int, updates: dict) -> tuple[dict, int]:
     """
